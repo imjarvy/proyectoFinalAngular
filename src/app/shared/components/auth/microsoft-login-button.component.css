@@ -1,0 +1,28 @@
+.ms-login-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 9999px;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.ms-login-button:hover {
+  background-color: #f3f4f6;
+}
+
+.ms-login-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ms-login-text {
+  white-space: nowrap;
+}

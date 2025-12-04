@@ -1,0 +1,62 @@
+<div class="ms-auth-page">
+  <section class="ms-auth-card">
+    <header class="ms-auth-header">
+      <h3 class="ms-auth-title">
+        {{ isAuthenticated() ? '¡Bienvenido!' : 'Iniciar Sesión' }}
+      </h3>
+      <p class="ms-auth-subtitle">
+        Inicia sesión con tu cuenta de Microsoft para acceder a todas las funcionalidades de la aplicación.
+      </p>
+    </header>
+
+    <main class="ms-auth-content" *ngIf="!isAuthenticated(); else authenticatedBlock">
+      <app-microsoft-login-button></app-microsoft-login-button>
+
+      <section class="ms-auth-info">
+        <h4>Información</h4>
+        <ul>
+          <li>Utiliza tu cuenta corporativa o personal de Microsoft</li>
+          <li>La autenticación es segura mediante OAuth 2.0</li>
+          <li>Solo solicitamos permisos básicos de lectura de perfil</li>
+        </ul>
+      </section>
+    </main>
+
+    <ng-template #authenticatedBlock>
+      <div class="ms-auth-success">
+        ✓ Autenticado exitosamente como <strong>{{ firstAccountName() }}</strong>
+      </div>
+    </ng-template>
+  </section>
+
+  <section *ngIf="isAuthenticated()" class="ms-auth-profile">
+    <app-microsoft-user-profile></app-microsoft-user-profile>
+  </section>
+
+  <section class="ms-auth-tech">
+    <h3>Información Técnica</h3>
+    <div class="ms-auth-tech-grid">
+      <div>
+        <span class="label">Estado de autenticación</span>
+        <p>{{ isAuthenticated() ? '🟢 Autenticado' : '🔴 No autenticado' }}</p>
+      </div>
+
+      <div>
+        <span class="label">Número de cuentas activas</span>
+        <p>{{ accountsCount() }}</p>
+      </div>
+
+      <ng-container *ngIf="accountsCount() > 0">
+        <div>
+          <span class="label">Tipo de cuenta</span>
+          <p>{{ accountType() }}</p>
+        </div>
+
+        <div>
+          <span class="label">Username</span>
+          <p class="break">{{ firstAccountUsername() }}</p>
+        </div>
+      </ng-container>
+    </div>
+  </section>
+</div>

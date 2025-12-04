@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { ClientLayoutComponent } from './core/layouts/client-layout.component';
+import { AuthLayoutComponent } from './core/layouts/auth-layout.component';
 import { OrdersComponent } from './shared/components/Client/orders.component';
 import { CartComponent } from './shared/components/Client/cart.component';
 import { ProfileComponent } from './shared/components/Client/profile.component';
@@ -19,7 +20,7 @@ export const routes: Routes = [
   },
   {
     path: 'auth/signin',
-    component: SignInComponent,
+    component: AuthLayoutComponent,
   },
   {
     path: 'dashboard/client',

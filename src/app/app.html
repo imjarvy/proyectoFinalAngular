@@ -1,28 +1,40 @@
 <app-msal-sync>
-  <app-header
-    [class.sidebar-collapsed]="!sidebarOpen || sidebarMobile"
-    [isMobile]="sidebarMobile"
-    [sidebarOpen]="sidebarOpen"
-    (toggleSidebar)="toggleSidebar()"
-    (goToHome)="goToHome()"
-  >
-  </app-header>
+  <!-- Header y sidebar solo fuera de rutas /auth -->
+  <ng-container *ngIf="!isAuthRoute; else authOnly">
+    <app-header
+      [class.sidebar-collapsed]="!sidebarOpen || sidebarMobile"
+      [isMobile]="sidebarMobile"
+      [sidebarOpen]="sidebarOpen"
+      (toggleSidebar)="toggleSidebar()"
+      (goToHome)="goToHome()"
+    >
+    </app-header>
 
-  <app-slide-bar #sidebar (sidebarStateChange)="onSidebarStateChange($event)"> </app-slide-bar>
+    <app-slide-bar #sidebar (sidebarStateChange)="onSidebarStateChange($event)"> </app-slide-bar>
 
-  <main
-    class="main-content"
-    [class.sidebar-open]="sidebarOpen && !sidebarMobile"
-    [class.sidebar-closed]="!sidebarOpen && !sidebarMobile"
-    [class.sidebar-mobile]="sidebarMobile"
-    [class.sidebar-mobile-open]="sidebarMobile && sidebarOpen"
-  >
-    <div class="container">
-      <router-outlet />
-      <!-- Mapa de Manizales BORRAR, ESTÁ AQUÍ PARA PRUEBAS, DEFINIR UBICACION FINAL -->
-      <app-map-consumer></app-map-consumer>
-    </div>
-  </main>
+    <main
+      class="main-content"
+      [class.sidebar-open]="sidebarOpen && !sidebarMobile"
+      [class.sidebar-closed]="!sidebarOpen && !sidebarMobile"
+      [class.sidebar-mobile]="sidebarMobile"
+      [class.sidebar-mobile-open]="sidebarMobile && sidebarOpen"
+    >
+      <div class="container">
+        <router-outlet />
+        <!-- Mapa sólo en /dashboard/client/cart y /dashboard/maps -->
+        <app-map-consumer *ngIf="showMap"></app-map-consumer>
+      </div>
+    </main>
+  </ng-container>
+
+  <!-- Layout simple para rutas /auth (sin header ni sidebar) -->
+  <ng-template #authOnly>
+    <main class="main-content">
+      <div class="container">
+        <router-outlet />
+      </div>
+    </main>
+  </ng-template>
 
   <!-- Chat flotante - Accesible desde cualquier página -->
   <app-floating-chat></app-floating-chat>
