@@ -6,7 +6,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
-import { AppComponent } from './app.component';
 import { MsalModule, MsalService, MsalBroadcastService, MsalGuard, MSAL_INSTANCE } from '@azure/msal-angular';
 import { PublicClientApplication } from '@azure/msal-browser';
 import { msalConfig } from './core/config/msal-config';
@@ -16,12 +15,12 @@ export function MSALInstanceFactory() {
 }
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [],
   imports: [
     BrowserModule,
     HttpClientModule,
     MsalModule,
-    // Importa aquí tus componentes standalone si los usas en rutas
+    // AppComponent es standalone, se bootstrapea directamente
   ],
   providers: [
     {
@@ -32,7 +31,7 @@ export function MSALInstanceFactory() {
     MsalBroadcastService,
     MsalGuard,
   ],
-  bootstrap: [AppComponent],
+  bootstrap: [],
 })
 export class AppModule {
   constructor() {
