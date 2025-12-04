@@ -1,0 +1,62 @@
+<!-- Sidebar responsive con iconos Bootstrap -->
+<nav class="sidebar" 
+     [class.open]="isOpen" 
+     [class.mobile]="isMobile" 
+     [style.display]="!isMobile || isOpen ? 'flex' : 'none'"
+     role="navigation" 
+     aria-label="Menú principal">
+  <div class="sidebar-header">
+    <div class="brand" role="link" tabindex="0" (click)="setActiveSection('inicio')" (keydown.enter)="setActiveSection('inicio')" title="Ir al inicio">
+      <img src="assets/motorcycle-sidebar.svg" alt="Moto" class="brand-icon" />
+    </div>
+    <!-- Botón de retracción -->
+    <button class="retract-btn" 
+            (click)="toggle()" 
+            [attr.aria-label]="isOpen ? 'Cerrar menú' : 'Abrir menú'"
+            title="Cerrar menú"
+            type="button">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <div class="sidebar-content">
+    <ng-container *ngIf="!selectedUserType">
+      <div class="user-type-select p-4">
+        <h3 class="mb-2 text-lg font-semibold">Selecciona el tipo de usuario:</h3>
+        <div class="user-type-btn-group">
+          <button *ngFor="let type of userTypes" (click)="selectUserType(type.value)" class="user-type-btn">
+            <span class="icon" aria-hidden="true">
+              <ng-container [ngSwitch]="type.value">
+                <i *ngSwitchCase="'client'" class="bi bi-person"></i>
+                <i *ngSwitchCase="'restaurant'" class="bi bi-shop"></i>
+                <i *ngSwitchCase="'admin'" class="bi bi-shield-lock"></i>
+                <i *ngSwitchCase="'driver'" class="bi bi-bicycle"></i>
+                <i *ngSwitchDefault class="bi bi-person"></i>
+              </ng-container>
+            </span>
+            <span class="label">{{ type.label }}</span>
+          </button>
+        </div>
+      </div>
+    </ng-container>
+    <ul class="menu" *ngIf="selectedUserType">
+      <li *ngFor="let link of links">
+        <a [routerLink]="link.route" routerLinkActive="font-bold text-blue-600">{{ link.label }}</a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="sidebar-footer">
+    <!-- Botón para cambiar tema -->
+    <button class="theme-toggle" 
+            (click)="themeService.toggleTheme()" 
+            [attr.aria-label]="themeService.isDark() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+            type="button">
+      <i class="bi" [class.bi-sun-fill]="themeService.isDark()" [class.bi-moon-fill]="!themeService.isDark()"></i>
+      <span class="label">{{ themeService.isDark() ? 'Modo Claro' : 'Modo Oscuro' }}</span>
+    </button>
+  </div>
+</nav>
+
+<!-- Overlay para cerrar al hacer clic fuera (visible siempre cuando sidebar está abierto) -->
+<div class="overlay" *ngIf="isOpen" (click)="close()" aria-hidden="true"></div>
