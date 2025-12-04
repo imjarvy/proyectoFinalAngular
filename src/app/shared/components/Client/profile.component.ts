@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { CustomerService } from '../../../core/services/customer.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { UserStorageManager } from '../../../core/utils/storage-manager';
 
 @Component({
   standalone: true,
@@ -25,13 +26,16 @@ export class ProfileComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const customerId = localStorage.getItem('customerId');
-    if (!customerId) {
+    // Recuperar el usuario autenticado desde el storage unificado
+    const user = UserStorageManager.getUser();
+    if (!user || !user.id) {
       alert('Por favor inicia sesión para ver tu perfil');
-      this.router.navigate(['/login']);
+      this.router.navigate(['/auth/signin']);
       return;
     }
-    this.loadCustomerData(Number(customerId));
+
+    // Usar el id del usuario autenticado como customer_id para cargar el perfil
+    this.loadCustomerData(Number(user.id));
   }
 
   loadCustomerData(id: number): void {

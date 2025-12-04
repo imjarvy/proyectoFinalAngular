@@ -6,6 +6,7 @@ import { MotorcycleService } from '../../../core/services/motorcycle.service';
 import { OrderService } from '../../../core/services/order.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { UserStorageManager } from '../../../core/utils/storage-manager';
 
 @Component({
   standalone: true,
@@ -14,14 +15,13 @@ import { FormsModule } from '@angular/forms';
   imports: [CommonModule, FormsModule]
 })
 export class CartComponent implements OnInit {
-  customerId: string|null = localStorage.getItem('customerId');
   cartItems: any[] = [];
   addresses: any[] = [];
   menus: any[] = [];
   motorcycles: any[] = [];
   maxItems = 1;
   form: any = {
-    customer_id: this.customerId,
+    customer_id: null,
     address: '',
     menu_id: '',
     motorcycle_id: '',
@@ -40,18 +40,18 @@ export class CartComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    if (!this.customerId) {
-      alert('Por favor inicia sesión para acceder al carrito');
-      this.router.navigate(['/login']);
-      return;
-    }
-
     const stored = localStorage.getItem('cart');
     if (stored) {
       this.cartItems = JSON.parse(stored);
       this.form.menu_id = this.cartItems[0]?.menu_id || '';
       this.form.quantity = this.cartItems[0]?.quantity || 1;
       this.form.total_price = this.cartItems[0] ? this.cartItems[0].price * this.cartItems[0].quantity : '';
+    }
+
+    // Rellenar customer_id a partir del usuario autenticado guardado en localStorage
+    const user = UserStorageManager.getUser();
+    if (user && user.id) {
+      this.form.customer_id = user.id;
     }
 
     this.fetchData();
@@ -112,7 +112,7 @@ export class CartComponent implements OnInit {
     if (missing.length > 0 || this.total <= 0) {
       const missingLabels = missing.map(f => f.label);
       if (this.total <= 0) missingLabels.push('Precio Total');
-      console.log('Faltan los siguientes datos para enviar el pedido:', missingLabels);
+      alert('Faltan los siguientes datos para enviar el pedido: ' + missingLabels.join(', '));
       return;
     }
     try {
