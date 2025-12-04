@@ -160,10 +160,16 @@ export class FirebaseAuthProviderService {
     if (!userEmail) {
       userEmail = `no-email-${firebaseUser.uid}@github.local`;
     }
+
+    // Foto de perfil: usar la de Firebase cuando exista.
+    // Solo en el caso especial de GitHub con email privado podríamos no tener avatar.
+    const photoURL = firebaseUser.photoURL || null;
+
     const user: AuthUser = {
       id: firebaseUser.uid,
       name: firebaseUser.displayName || 'Usuario Sin Nombre',
       email: userEmail,
+      photoURL,
       token,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),

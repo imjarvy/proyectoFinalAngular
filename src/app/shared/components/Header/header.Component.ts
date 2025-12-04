@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { UserAvatarComponent } from './user.Avatar.Component';
 import { AuthService } from '../../../core/services/auth.service';
+import { UserStorageManager } from '../../../core/utils/storage-manager';
 
 @Component({
   standalone: true,
@@ -22,7 +23,9 @@ export class HeaderComponent {
   @Output() toggleSidebar = new EventEmitter<void>();
   @Output() goToHome = new EventEmitter<void>();
 
-  photoURL = localStorage.getItem('photoURL') || '';
+  photoURL = '';
+  userName = '';
+  userEmail = '';
   showProfileMenu = false;
 
   constructor(private router: Router, private authService: AuthService) {}
@@ -40,6 +43,29 @@ export class HeaderComponent {
     this.showProfileMenu = !this.showProfileMenu;
   }
 
+  ngOnInit() {
+    // Inicializar datos del usuario desde el storage unificado
+    const user = UserStorageManager.getUser();
+    if (user) {
+      this.photoURL = (user as any).photoURL || '';
+      this.userName = (user as any).displayName || (user as any).name || '';
+      this.userEmail = user.email || '';
+    }
+
+    // Suscribirse al observable de usuario por si cambia en runtime
+    this.authService.user$.subscribe(u => {
+      if (!u) {
+        this.photoURL = '';
+        this.userName = '';
+        this.userEmail = '';
+        return;
+      }
+      this.photoURL = (u as any).photoURL || '';
+      this.userName = (u as any).displayName || (u as any).name || '';
+      this.userEmail = u.email || '';
+    });
+  }
+
   async logout() {
     this.showProfileMenu = false;
     try {
@@ -47,8 +73,10 @@ export class HeaderComponent {
     } catch (e) {
       console.error('Error en logout global:', e);
     }
-    // Actualizar avatar por si dependía de localStorage
+    // Limpiar datos locales
     this.photoURL = '';
+    this.userName = '';
+    this.userEmail = '';
     this.router.navigate(['/auth/signin']);
   }
 }
