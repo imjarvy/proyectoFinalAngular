@@ -23,7 +23,6 @@ export class MsalSyncComponent implements OnInit {
 
   constructor(
     private msalService: MsalService,
-    private msalBroadcast: MsalBroadcastService,
     private graph: MicrosoftGraphService,
     private authState: MicrosoftAuthService
   ) {}
@@ -34,37 +33,15 @@ export class MsalSyncComponent implements OnInit {
       await (this.msalService as any).initialize();
     }
 
-    // Intentamos sincronizar cuando haya cuentas disponibles
+    // Solo intentamos sincronizar una vez al cargar la app
     const accounts = this.msalService.instance.getAllAccounts();
-
-    // Solo intentamos una vez al inicio; si falla, no spameamos.
-    if (!this.hasTriedInitialSync && accounts.length > 0) {
-      this.hasTriedInitialSync = true;
+    if (accounts.length > 0) {
       try {
         await this.syncMsalToState(accounts[0]);
       } catch (e) {
         console.warn('MsalSync: no se pudo sincronizar al iniciar, se ignora:', e);
       }
     }
-
-    // También escuchamos eventos MSAL (opcional)
-    this.msalBroadcast.msalSubject$
-      .pipe(filter(() => true))
-      .subscribe(() => {
-        const a = this.msalService.instance.getAllAccounts();
-
-        // Si ya sincronizamos una vez en esta sesión, no volvemos a llamar a Graph
-        if (this.hasTriedInitialSync) {
-          return;
-        }
-
-        if (a.length > 0) {
-          this.hasTriedInitialSync = true;
-          this.syncMsalToState(a[0]).catch(err => {
-            console.warn('MsalSync: error al sincronizar desde evento, se ignora:', err);
-          });
-        }
-      });
   }
 
   private async syncMsalToState(account: any) {

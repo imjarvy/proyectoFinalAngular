@@ -19,14 +19,9 @@ interface MicrosoftAuthState {
 
 @Injectable({ providedIn: 'root' })
 export class MicrosoftAuthService {
-  private state$ = new BehaviorSubject<MicrosoftAuthState>({
-    isAuthenticated: false,
-    user: null,
-    photo: null,
-    accessToken: null,
-    loading: false,
-    error: null,
-  });
+  private readonly STORAGE_KEY = 'ms_auth_state_v1';
+
+  private state$ = new BehaviorSubject<MicrosoftAuthState>(this.loadInitialState());
 
   state = this.state$.asObservable();
 
@@ -34,38 +29,98 @@ export class MicrosoftAuthService {
     return this.state$.getValue();
   }
 
+  private loadInitialState(): MicrosoftAuthState {
+    try {
+      const raw = localStorage.getItem(this.STORAGE_KEY);
+      if (!raw) {
+        return {
+          isAuthenticated: false,
+          user: null,
+          photo: null,
+          accessToken: null,
+          loading: false,
+          error: null,
+        };
+      }
+      const parsed = JSON.parse(raw) as MicrosoftAuthState;
+      return {
+        ...parsed,
+        loading: false,
+        error: null,
+      };
+    } catch {
+      return {
+        isAuthenticated: false,
+        user: null,
+        photo: null,
+        accessToken: null,
+        loading: false,
+        error: null,
+      };
+    }
+  }
+
+  private persist(next: MicrosoftAuthState): void {
+    try {
+      const toStore: MicrosoftAuthState = {
+        ...next,
+        loading: false,
+        error: null,
+      };
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(toStore));
+    } catch {
+      // si localStorage falla, simplemente no persistimos
+    }
+  }
+
   setAuthenticated(v: boolean): void {
-    this.state$.next({ ...this.value, isAuthenticated: v });
+    const next = { ...this.value, isAuthenticated: v };
+    this.state$.next(next);
+    this.persist(next);
   }
 
   setUserData(user: MicrosoftUser | null): void {
-    this.state$.next({ ...this.value, user });
+    const next = { ...this.value, user };
+    this.state$.next(next);
+    this.persist(next);
   }
 
   setUserPhoto(photo: string | null): void {
-    this.state$.next({ ...this.value, photo });
+    const next = { ...this.value, photo };
+    this.state$.next(next);
+    this.persist(next);
   }
 
   setAccessToken(token: string | null): void {
-    this.state$.next({ ...this.value, accessToken: token });
+    const next = { ...this.value, accessToken: token };
+    this.state$.next(next);
+    this.persist(next);
   }
 
   setLoading(loading: boolean): void {
-    this.state$.next({ ...this.value, loading });
+    const next = { ...this.value, loading };
+    this.state$.next(next);
   }
 
   setError(error: string | null): void {
-    this.state$.next({ ...this.value, error });
+    const next = { ...this.value, error };
+    this.state$.next(next);
   }
 
   logout(): void {
-    this.state$.next({
+    const next: MicrosoftAuthState = {
       isAuthenticated: false,
       user: null,
       photo: null,
       accessToken: null,
       loading: false,
       error: null,
-    });
+    };
+    this.state$.next(next);
+    try {
+      localStorage.removeItem(this.STORAGE_KEY);
+    } catch {
+      // ignorar errores de storage
+    }
   }
 }
