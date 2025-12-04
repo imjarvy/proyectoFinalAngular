@@ -48,11 +48,14 @@ export class CartComponent implements OnInit {
       this.form.total_price = this.cartItems[0] ? this.cartItems[0].price * this.cartItems[0].quantity : '';
     }
 
-    // Rellenar customer_id a partir del usuario autenticado guardado en localStorage
-    const user = UserStorageManager.getUser();
-    if (user && user.id) {
-      this.form.customer_id = user.id;
+    // Seguir el mismo patrón que en React: usar customerId desde localStorage
+    const customerId = localStorage.getItem('customerId');
+    if (!customerId) {
+      alert('Por favor inicia sesión para acceder al carrito');
+      this.router.navigate(['/auth/signin']);
+      return;
     }
+    this.form.customer_id = customerId;
 
     this.fetchData();
   }

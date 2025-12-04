@@ -6,6 +6,8 @@ import { UserStorageManager } from '../utils/storage-manager';
 import securityService from './security.service';
 import { AuthUser } from '../models/auth.model';
 import { MsalService } from '@azure/msal-angular';
+import { CustomerService } from './customer.service';
+import { firstValueFrom } from 'rxjs';
 
 interface AuthState {
 	user: AuthUser | null;
@@ -25,6 +27,7 @@ export class AuthService {
 		private firebaseAuth: FirebaseAuthProviderService,
 		private msAuthState: MicrosoftAuthService,
 		private msal: MsalService,
+		private customerService: CustomerService,
 	) {
 		// Inicializar desde localStorage / MSAL state
 		this.bootstrapFromStorageAndMsal();
@@ -62,6 +65,48 @@ export class AuthService {
 		this.state$.next({ ...current, loading: v });
 	}
 
+	// Sincroniza el usuario autenticado con el backend de clientes y guarda customerId en localStorage
+	// Copia la lógica usada en React: buscar por email y solo crear si no existe.
+	private async syncCustomerId(user: AuthUser): Promise<void> {
+		try {
+			const email = user.email;
+			if (!email) {
+				console.warn('syncCustomerId: usuario sin email, no se puede sincronizar');
+				return;
+			}
+
+			// 1) Obtener todos los customers y buscar por email (igual que en React)
+			const allCustomers = await firstValueFrom(this.customerService.getAll());
+			const existing = (allCustomers ?? []).find((c: any) => c.email === email);
+
+			let customer: any = existing;
+
+			// 2) Si no existe, crearlo
+			if (!customer) {
+				const payload: any = {
+					name: user.name || (user as any).displayName || 'Usuario',
+					email,
+					phone: '',
+					provider: user.provider || (user as any).provider || 'firebase',
+				};
+				customer = await firstValueFrom(this.customerService.create(payload));
+			}
+
+			// 3) Si tenemos id, guardarlo en localStorage
+			if (customer && customer.id != null) {
+				localStorage.setItem('customerId', String(customer.id));
+				console.log('customerId sincronizado con backend:', customer.id);
+			} else {
+				console.warn('syncCustomerId: customer sin id, no se pudo guardar customerId', customer);
+			}
+		} catch (e) {
+			console.warn('No se pudo sincronizar customerId con backend (se continúa igual):', e);
+			// Opcional: imitar comportamiento de React guardando datos temporales
+			// localStorage.setItem('tempEmail', user.email || '');
+			// localStorage.setItem('tempName', user.name || (user as any).displayName || 'Usuario');
+		}
+	}
+
 	async signInWithGoogle(): Promise<void> {
 		this.setLoading(true);
 		try {
@@ -72,6 +117,8 @@ export class AuthService {
 			} catch (e) {
 				console.warn('Error integrando Google con backend (se continúa igual):', e);
 			}
+			// Sincronizar/crear Customer en backend y guardar customerId
+			await this.syncCustomerId(result.user);
 			this.state$.next({ user: result.user, loading: false });
 		} catch (err) {
 			console.error('Error en signInWithGoogle:', err);
@@ -90,6 +137,8 @@ export class AuthService {
 			} catch (e) {
 				console.warn('Error integrando GitHub con backend (se continúa igual):', e);
 			}
+			// Sincronizar/crear Customer en backend y guardar customerId
+			await this.syncCustomerId(result.user);
 			this.state$.next({ user: result.user, loading: false });
 		} catch (err) {
 			console.error('Error en signInWithGithub:', err);
