@@ -9,12 +9,14 @@ import { Injectable } from '@angular/core';
 import { initializeApp, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth, GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut, User as FirebaseUser } from 'firebase/auth';
 import { isFirebaseConfigured } from '../config/firebase.config';
+import { environment } from '../../../environments/environment';
 import { UserStorageManager } from '../utils/storage-manager';
 import { AuthUser } from '../models/auth.model';
 
 @Injectable({ providedIn: 'root' })
 export class FirebaseAuthProviderService {
-  private config: any = (window as any).__FIREBASE_CONFIG__ || {};
+  // Usamos directamente la configuración de Firebase del environment de Angular
+  private config: any = (window as any).__FIREBASE_CONFIG__ || environment.firebase;
   private isInitialized = false;
   private app: FirebaseApp | null = null;
   private auth: Auth | null = null;
