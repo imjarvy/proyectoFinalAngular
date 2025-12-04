@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { initializeApp, FirebaseApp } from 'firebase/app';
-import { getAuth, Auth, GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut, User as FirebaseUser } from 'firebase/auth';
+import { getAuth, Auth, GoogleAuthProvider, GithubAuthProvider, signInWithPopup, signOut as firebaseSignOut, User as FirebaseUser } from 'firebase/auth';
 import { isFirebaseConfigured } from '../config/firebase.config';
 import { environment } from '../../../environments/environment';
 import { UserStorageManager } from '../utils/storage-manager';
@@ -21,6 +21,7 @@ export class FirebaseAuthProviderService {
   private app: FirebaseApp | null = null;
   private auth: Auth | null = null;
   private provider: GoogleAuthProvider | null = null;
+  private githubProvider: GithubAuthProvider | null = null;
 
   constructor() {}
 
@@ -38,6 +39,8 @@ export class FirebaseAuthProviderService {
       this.provider.addScope('email');
       this.provider.addScope('profile');
       this.provider.setCustomParameters({ prompt: 'select_account' });
+      this.githubProvider = new GithubAuthProvider();
+      this.githubProvider.addScope('user:email');
       this.isInitialized = true;
       console.log('Firebase initialized successfully');
     } catch (error) {
@@ -63,6 +66,30 @@ export class FirebaseAuthProviderService {
       return this.mapFirebaseUserToAuthResult(firebaseUser, token);
     } catch (error: any) {
       console.error('Sign in failed:', error);
+      throw error;
+    }
+  }
+
+  async signInWithGithub(): Promise<{ user: AuthUser; token: string; refreshToken?: string }> {
+    await this.initialize();
+    try {
+      if (!isFirebaseConfigured() || !this.auth || !this.githubProvider) {
+        console.warn('Using development auth (Firebase GitHub not configured)');
+        const temp = this.createTemporaryAuthResult();
+        temp.user.provider = 'github';
+        return temp;
+      }
+      const result = await signInWithPopup(this.auth, this.githubProvider);
+      const firebaseUser = result.user;
+      if (!firebaseUser.email) {
+        await (firebaseUser as any).reload?.();
+      }
+      const token = await firebaseUser.getIdToken();
+      const mapped = this.mapFirebaseUserToAuthResult(firebaseUser, token);
+      mapped.user.provider = 'github';
+      return mapped;
+    } catch (error: any) {
+      console.error('GitHub sign in failed:', error);
       throw error;
     }
   }
@@ -120,12 +147,18 @@ export class FirebaseAuthProviderService {
     let userEmail = firebaseUser.email;
     if (!userEmail && firebaseUser.providerData && firebaseUser.providerData.length > 0) {
       const googleProvider = firebaseUser.providerData.find(p => p.providerId === 'google.com');
+      const githubProvider = firebaseUser.providerData.find(p => p.providerId === 'github.com');
+
       if (googleProvider && (googleProvider as any).email) {
         userEmail = (googleProvider as any).email;
+      } else if (githubProvider && (githubProvider as any).email) {
+        userEmail = (githubProvider as any).email;
       }
     }
+
+    // Si aún no hay email (por ejemplo, usuario de GitHub con email privado), usamos un placeholder
     if (!userEmail) {
-      throw new Error('NO_EMAIL: No se pudo obtener el email del usuario');
+      userEmail = `no-email-${firebaseUser.uid}@github.local`;
     }
     const user: AuthUser = {
       id: firebaseUser.uid,

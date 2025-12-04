@@ -39,14 +39,13 @@ export class MsalSyncComponent implements OnInit {
       try {
         await this.syncMsalToState(accounts[0]);
       } catch (e) {
-        console.warn('MsalSync: no se pudo sincronizar al iniciar, se ignora:', e);
+        console.warn('MsalSync: no se pudo sincronizar al iniciar, se ignora (best-effort):', e);
       }
     }
   }
 
   private async syncMsalToState(account: any) {
     try {
-      this.authState.setLoading(true);
       const tokenResponse: any = await this.msalService.acquireTokenSilent({
         scopes: ['User.Read'],
         account,
@@ -68,6 +67,7 @@ export class MsalSyncComponent implements OnInit {
         token: tokenResponse.accessToken,
       };
 
+      // Best-effort: solo rellenamos estado si todo sale bien.
       this.authState.setAuthenticated(true);
       this.authState.setUserData(userData);
       this.authState.setAccessToken(tokenResponse.accessToken);
@@ -96,12 +96,10 @@ export class MsalSyncComponent implements OnInit {
         console.warn('No se pudo obtener la foto del usuario');
       }
 
-      this.authState.setLoading(false);
       console.log('🔄 MsalSync: Sincronización Microsoft completada');
     } catch (error) {
-      console.error('Error al sincronizar datos:', error);
-      this.authState.setLoading(false);
-      this.authState.setError('Error al sincronizar MSAL');
+      // Best-effort: si falla, solo logueamos y NO tocamos estado ni marcamos error global
+      console.warn('MsalSync: error al sincronizar datos (se ignora, login principal manda):', error);
     }
   }
 }

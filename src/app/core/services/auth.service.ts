@@ -78,6 +78,24 @@ export class AuthService {
 		}
 	}
 
+	async signInWithGithub(): Promise<void> {
+		this.setLoading(true);
+		try {
+			const result = await this.firebaseAuth.signInWithGithub();
+			UserStorageManager.saveUser(result.user, result.token);
+			try {
+				await (securityService as any).loginWithFirebase?.(result.user);
+			} catch (e) {
+				console.warn('Error integrando GitHub con backend (se continúa igual):', e);
+			}
+			this.state$.next({ user: result.user, loading: false });
+		} catch (err) {
+			console.error('Error en signInWithGithub:', err);
+			this.setLoading(false);
+			throw err;
+		}
+	}
+
 	signOut(): void {
 		this.firebaseAuth.signOut().catch(err => console.error('Error signOut Firebase:', err));
 		(securityService as any).logout?.();

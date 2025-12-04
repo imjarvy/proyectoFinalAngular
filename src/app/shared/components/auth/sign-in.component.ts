@@ -86,6 +86,16 @@ import type { AuthenticationResult } from '@azure/msal-browser';
 
                 <button
                   type="button"
+                  (click)="handleGithubSignIn()"
+                  [disabled]="isGoogleLoading"
+                  class="flex w-full items-center justify-center gap-3.5 rounded-lg border border-stroke bg-gray p-4 hover:bg-opacity-50 dark:border-strokedark dark:bg-meta-4 dark:hover:bg-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span *ngIf="!isGoogleLoading">Sign in with GitHub</span>
+                  <span *ngIf="isGoogleLoading">Signing in...</span>
+                </button>
+
+                <button
+                  type="button"
                   (click)="handleMicrosoftLogin()"
                   class="flex w-full items-center justify-center gap-3.5 rounded-lg border border-[#9CA3AF] dark:border-[#5B5B60] bg-[#DDDCDB] dark:bg-[#2D3748] p-4 hover:bg-opacity-50 dark:hover:bg-opacity-50 text-[#1E3A8A] dark:text-[#F5F7FA]"
                 >
@@ -151,6 +161,21 @@ export class SignInComponent {
     } catch (err: any) {
       console.error('Error en Google login:', err);
       this.error = err?.message || 'Error al iniciar sesión con Google';
+    } finally {
+      this.isGoogleLoading = false;
+    }
+  }
+
+  async handleGithubSignIn(): Promise<void> {
+    this.isGoogleLoading = true;
+    this.error = null;
+    try {
+			await this.authService.signInWithGithub();
+			console.log('GitHub login exitoso');
+      await this.router.navigate(['/dashboard/client']);
+    } catch (err: any) {
+      console.error('Error en GitHub login:', err);
+      this.error = err?.message || 'Error al iniciar sesión con GitHub';
     } finally {
       this.isGoogleLoading = false;
     }
