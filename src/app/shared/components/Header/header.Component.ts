@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { UserAvatarComponent } from './user.Avatar.Component';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   standalone: true,
@@ -24,7 +25,7 @@ export class HeaderComponent {
   photoURL = localStorage.getItem('photoURL') || '';
   showProfileMenu = false;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   onToggleSidebar() {
     this.toggleSidebar.emit();
@@ -39,10 +40,15 @@ export class HeaderComponent {
     this.showProfileMenu = !this.showProfileMenu;
   }
 
-  logout() {
-    // Implement logout logic here
-    console.log('Logout clicked');
+  async logout() {
     this.showProfileMenu = false;
-    // TODO: Add actual logout logic (clear tokens, redirect, etc.)
+    try {
+      await this.authService.signOut();
+    } catch (e) {
+      console.error('Error en logout global:', e);
+    }
+    // Actualizar avatar por si dependía de localStorage
+    this.photoURL = '';
+    this.router.navigate(['/auth/signin']);
   }
 }

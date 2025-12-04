@@ -6,7 +6,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MicrosoftAuthService } from '../../../core/services/microsoft-auth.service';
-import { MsalService } from '@azure/msal-angular';
+import { AuthService } from '../../../core/services/auth.service';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -62,14 +63,18 @@ import { Observable } from 'rxjs';
 export class MicrosoftUserProfileComponent {
   state$: Observable<any>;
 
-  constructor(private authState: MicrosoftAuthService, private msalService: MsalService) {
+  constructor(
+    private authState: MicrosoftAuthService,
+    private authService: AuthService,
+    private router: Router,
+  ) {
     this.state$ = this.authState.state;
   }
 
   async handleLogout() {
     try {
-      await this.msalService.logoutPopup();
-      this.authState.logout();
+      await this.authService.signOut();
+      this.router.navigate(['/auth/signin']);
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
     }

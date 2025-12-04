@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 import { FirebaseAuthProviderService } from './firebase-auth-provider.service';
 import { MicrosoftAuthService } from './microsoft-auth.service';
 import { UserStorageManager } from '../utils/storage-manager';
 import securityService from './security.service';
 import { AuthUser } from '../models/auth.model';
+import { MsalService } from '@azure/msal-angular';
 
 interface AuthState {
 	user: AuthUser | null;
@@ -23,6 +24,7 @@ export class AuthService {
 	constructor(
 		private firebaseAuth: FirebaseAuthProviderService,
 		private msAuthState: MicrosoftAuthService,
+		private msal: MsalService,
 	) {
 		// Inicializar desde localStorage / MSAL state
 		this.bootstrapFromStorageAndMsal();
@@ -96,10 +98,41 @@ export class AuthService {
 		}
 	}
 
-	signOut(): void {
-		this.firebaseAuth.signOut().catch(err => console.error('Error signOut Firebase:', err));
-		(securityService as any).logout?.();
-		UserStorageManager.clearUser();
-		this.state$.next({ user: null, loading: false });
+	async signOut(): Promise<void> {
+		this.setLoading(true);
+		try {
+			// 1) Firebase
+			try {
+				await this.firebaseAuth.signOut();
+			} catch (err) {
+				console.error('Error signOut Firebase:', err);
+			}
+
+			// 2) Backend propio (si existe)
+			try {
+				await (securityService as any).logout?.();
+			} catch (e) {
+				console.warn('Error cerrando sesión en backend (se continúa):', e);
+			}
+
+			// 3) Microsoft (MSAL)
+			try {
+				const accounts = this.msal.instance.getAllAccounts();
+				if (accounts.length > 0) {
+					await this.msal.logoutPopup({
+						account: accounts[0],
+					} as any);
+				}
+			} catch (e) {
+				console.warn('Error cerrando sesión Microsoft (MSAL):', e);
+			}
+
+			// 4) Estado interno + storage
+			this.msAuthState.logout();
+			UserStorageManager.clearUser();
+			this.state$.next({ user: null, loading: false });
+		} finally {
+			this.setLoading(false);
+		}
 	}
 }
