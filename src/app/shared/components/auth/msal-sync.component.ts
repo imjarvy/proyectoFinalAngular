@@ -18,6 +18,9 @@ import securityService from '../../../core/services/security.service'; // ajusta
   template: `<ng-content></ng-content>`
 })
 export class MsalSyncComponent implements OnInit {
+  /** Para evitar reintentos infinitos */
+  private hasTriedInitialSync = false;
+
   constructor(
     private msalService: MsalService,
     private msalBroadcast: MsalBroadcastService,
@@ -25,12 +28,23 @@ export class MsalSyncComponent implements OnInit {
     private authState: MicrosoftAuthService
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    // Asegurar inicialización de MSAL antes de interactuar con la instancia
+    if (typeof (this.msalService as any).initialize === 'function') {
+      await (this.msalService as any).initialize();
+    }
+
     // Intentamos sincronizar cuando haya cuentas disponibles
-    // Usamos msalService.instance.getAllAccounts() como fuente rápida
     const accounts = this.msalService.instance.getAllAccounts();
-    if (accounts.length > 0) {
-      this.syncMsalToState(accounts[0]);
+
+    // Solo intentamos una vez al inicio; si falla, no spameamos.
+    if (!this.hasTriedInitialSync && accounts.length > 0) {
+      this.hasTriedInitialSync = true;
+      try {
+        await this.syncMsalToState(accounts[0]);
+      } catch (e) {
+        console.warn('MsalSync: no se pudo sincronizar al iniciar, se ignora:', e);
+      }
     }
 
     // También escuchamos eventos MSAL (opcional)
@@ -38,7 +52,18 @@ export class MsalSyncComponent implements OnInit {
       .pipe(filter(() => true))
       .subscribe(() => {
         const a = this.msalService.instance.getAllAccounts();
-        if (a.length > 0) this.syncMsalToState(a[0]);
+
+        // Si ya sincronizamos una vez en esta sesión, no volvemos a llamar a Graph
+        if (this.hasTriedInitialSync) {
+          return;
+        }
+
+        if (a.length > 0) {
+          this.hasTriedInitialSync = true;
+          this.syncMsalToState(a[0]).catch(err => {
+            console.warn('MsalSync: error al sincronizar desde evento, se ignora:', err);
+          });
+        }
       });
   }
 

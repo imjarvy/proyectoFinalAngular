@@ -15,10 +15,10 @@ export const environment = {
   microsoft: {
     clientId: 'e928a93a-2705-49d4-b218-b2ef443c6628',
     tenantId: '6cea39d3-d922-4122-90b8-4e7cf0d07b3d',
-    // Redirect URI para SPA (debe coincidir con Azure, ajusta al puerto de Angular si cambia)
-    redirectUri: 'http://localhost:4200', // en React era 5173/auth/callback
+    // Redirect URI para SPA (debe coincidir EXACTAMENTE con Azure)
+    redirectUri: 'http://localhost:5173/auth/callback',
     authority: 'https://login.microsoftonline.com/common',
-    logoutUri: 'http://localhost:4200', // en React era 5173
+    logoutUri: 'http://localhost:5173',
   },
 
   // ========================================

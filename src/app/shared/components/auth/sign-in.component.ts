@@ -159,17 +159,23 @@ export class SignInComponent {
   async handleMicrosoftLogin(): Promise<void> {
     try {
       console.log('1. Iniciando login con Microsoft...');
+
+      // Asegurar que MSAL esté inicializado antes de usar cualquier API
+      if (typeof (this.msalService as any).initialize === 'function') {
+        await (this.msalService as any).initialize();
+      }
+
       const loginResponse = (await firstValueFrom(
         this.msalService.loginPopup(loginRequest)
       )) as AuthenticationResult;
       console.log('2. Login exitoso:', loginResponse);
 
       const tokenResponse = await firstValueFrom(
-			this.msalService.acquireTokenSilent({
-				scopes: ['User.Read'],
-				account: loginResponse.account,
-			})
-		);
+    this.msalService.acquireTokenSilent({
+      scopes: ['User.Read'],
+      account: loginResponse.account,
+    })
+  );
       console.log('3. Token obtenido');
 
       console.log('4. Obteniendo datos del usuario...');
