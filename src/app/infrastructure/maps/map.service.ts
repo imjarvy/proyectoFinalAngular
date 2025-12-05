@@ -7,6 +7,7 @@ export class MapService {
   private L: any = null;
   private map: any = null;
   private markers: Map<string, any> = new Map();
+  private routes: Map<string, any> = new Map();
 
   private async loadLeaflet(): Promise<any> {
     if (this.L) return this.L;
@@ -120,10 +121,48 @@ export class MapService {
       this.map.remove();
       this.map = null;
       this.markers.clear();
+      this.clearAllRoutes();
     }
   }
 
   isInitialized() {
     return !!this.map;
+  }
+
+  // Dibuja una ruta (polyline) a partir de latlngs o GeoJSON
+  drawRoute(id: string, data: Array<[number, number]> | { type: string; coordinates: any }, options?: any) {
+    if (!this.map || !this.L) return null;
+    // limpiar ruta previa con mismo id
+    this.clearRoute(id);
+
+    let layer: any = null;
+    if (Array.isArray(data)) {
+      const latlngs = data.map(([lat, lng]) => [lat, lng]);
+      layer = this.L.polyline(latlngs, {
+        color: '#0ea5e9',
+        weight: 4,
+        opacity: 0.8,
+        ...options,
+      }).addTo(this.map);
+      this.fitBounds(layer.getBounds());
+    } else if (data && (data as any).type) {
+      // GeoJSON
+      layer = this.L.geoJSON(data as any, options).addTo(this.map);
+      this.fitBounds(layer.getBounds());
+    }
+    if (layer) this.routes.set(id, layer);
+    return layer;
+  }
+
+  clearRoute(id: string) {
+    const r = this.routes.get(id);
+    if (r && this.map) {
+      this.map.removeLayer(r);
+      this.routes.delete(id);
+    }
+  }
+
+  clearAllRoutes() {
+    for (const id of Array.from(this.routes.keys())) this.clearRoute(id);
   }
 }

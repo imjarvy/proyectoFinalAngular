@@ -1,54 +1,92 @@
-<div>
-  <div class="flex justify-between items-center mb-4">
-    <h2 class="text-xl font-bold">Motocicletas</h2>
-    <a
-      [routerLink]="['/dashboard/admin/motorcycles/new']"
-      class="bg-blue-600 text-white px-4 py-2 rounded"
-    >
-      Agregar moto
-    </a>
+<div class="moto-view max-w-5xl mx-auto p-6">
+  <style>
+    .moto-view { font-family:'Poppins','Segoe UI',system-ui,-apple-system,sans-serif; color:#0f172a; }
+    .moto-card { background:#fff; border-radius:20px; padding:26px; box-shadow:0 20px 44px rgba(15,23,42,0.12); border:1px solid rgba(15,23,42,0.06); position:relative; overflow:hidden; }
+    .moto-card::after { content:""; position:absolute; inset:-80% 60% auto; width:340px; height:340px; background:radial-gradient(circle at center, rgba(37,99,235,0.16), transparent 65%); filter:blur(16px); pointer-events:none; }
+    .moto-header { position:relative; z-index:1; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:16px; margin-bottom:20px; }
+    .moto-title { font-size:1.9rem; font-weight:800; margin:0; }
+    .btn-primary { background:linear-gradient(135deg,#2563eb,#7c3aed); color:#fff; padding:12px 18px; border:none; border-radius:12px; font-weight:700; box-shadow:0 16px 32px rgba(37,99,235,0.24); transition:transform .18s ease, box-shadow .18s ease; }
+    .btn-primary:hover { transform:translateY(-2px); box-shadow:0 20px 40px rgba(37,99,235,0.3); }
+    .loader-card { position:relative; z-index:1; padding:14px 16px; border-radius:12px; border:1px dashed rgba(37,99,235,0.22); background:rgba(37,99,235,0.06); color:#1d4ed8; font-weight:600; }
+    .moto-table { width:100%; border-collapse:separate; border-spacing:0; border-radius:18px; overflow:hidden; position:relative; z-index:1; box-shadow:0 16px 32px rgba(15,23,42,0.1); }
+    .moto-table thead th { background:linear-gradient(90deg,#1e3a8a,#2563eb); color:#fff; padding:14px 16px; text-align:left; font-size:0.76rem; letter-spacing:0.08em; text-transform:uppercase; font-weight:700; }
+    .moto-table tbody td { background:#fff; padding:14px 16px; border-bottom:1px solid rgba(15,23,42,0.06); color:#334155; }
+    .moto-table tbody tr:nth-child(even) td { background:#f8fafc; }
+    .moto-table tbody tr:hover td { background:rgba(37,99,235,0.08); }
+    .cell-strong { font-weight:700; color:#0f172a; }
+    .cell-muted { color:#6b7280; }
+    .actions { display:flex; gap:10px; justify-content:flex-end; }
+    .cell-right { text-align:right; }
+    .chip-btn { border:none; padding:8px 14px; border-radius:999px; font-weight:600; transition:transform .18s ease, box-shadow .18s ease; cursor:pointer; }
+    .chip-edit { background:rgba(37,99,235,0.12); color:#1d4ed8; box-shadow:0 12px 24px rgba(37,99,235,0.18); }
+    .chip-edit:hover { transform:translateY(-2px); box-shadow:0 16px 30px rgba(37,99,235,0.24); }
+    .chip-delete { background:rgba(239,68,68,0.14); color:#b91c1c; box-shadow:0 12px 24px rgba(239,68,68,0.18); }
+    .chip-delete:hover { transform:translateY(-2px); box-shadow:0 16px 30px rgba(239,68,68,0.24); }
+    .empty-row { text-align:center; padding:18px; font-weight:600; color:#64748b; }
+    @media(max-width:768px){
+      .moto-card { padding:22px; }
+      .moto-table, .moto-table thead, .moto-table tbody, .moto-table th, .moto-table td, .moto-table tr { display:block; }
+      .moto-table thead { display:none; }
+      .moto-table tbody tr { margin-bottom:12px; border:1px solid rgba(15,23,42,0.08); border-radius:14px; overflow:hidden; box-shadow:0 14px 28px rgba(15,23,42,0.08); }
+      .moto-table tbody td { display:flex; justify-content:space-between; align-items:center; padding:12px 14px; }
+      .moto-table tbody td::before { content:attr(data-label); font-weight:700; color:#0f172a; text-transform:uppercase; letter-spacing:0.06em; font-size:0.7rem; }
+      .actions { justify-content:flex-start; }
+    }
+  </style>
+
+  <div class="moto-card">
+    <div class="moto-header">
+      <h2 class="moto-title">Motocicletas</h2>
+      <a
+        [routerLink]="['/dashboard/admin/motorcycles/new']"
+        class="btn-primary"
+      >
+        Agregar moto
+      </a>
+    </div>
+
+    <ng-container *ngIf="loading; else tableTpl">
+      <div class="loader-card">Cargando motocicletas...</div>
+    </ng-container>
+    <ng-template #tableTpl>
+      <table class="moto-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Placa</th>
+            <th>Marca</th>
+            <th>Año</th>
+            <th>Estado</th>
+            <th class="cell-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let moto of motorcycles">
+            <td class="cell-strong" data-label="ID">{{ moto.id }}</td>
+            <td class="cell-strong" data-label="Placa">{{ moto.license_plate }}</td>
+            <td class="cell-muted" data-label="Marca">{{ moto.brand }}</td>
+            <td class="cell-muted" data-label="Año">{{ moto.year }}</td>
+            <td class="cell-muted" data-label="Estado">{{ moto.status }}</td>
+            <td class="actions" data-label="Acciones">
+              <button
+                (click)="goEdit(moto.id)"
+                class="chip-btn chip-edit"
+              >
+                Editar
+              </button>
+              <button
+                (click)="handleDelete(moto.id)"
+                class="chip-btn chip-delete"
+              >
+                Eliminar
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="motorcycles.length === 0">
+            <td colspan="6" class="empty-row">Sin motocicletas registradas.</td>
+          </tr>
+        </tbody>
+      </table>
+    </ng-template>
   </div>
-  <ng-container *ngIf="loading; else tableTpl">
-    <p>Cargando...</p>
-  </ng-container>
-  <ng-template #tableTpl>
-    <table class="w-full border">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Placa</th>
-          <th>Marca</th>
-          <th>Año</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let moto of motorcycles">
-          <td>{{ moto.id }}</td>
-          <td>{{ moto.license_plate }}</td>
-          <td>{{ moto.brand }}</td>
-          <td>{{ moto.year }}</td>
-          <td>{{ moto.status }}</td>
-          <td>
-            <button
-              (click)="goEdit(moto.id)"
-              class="text-blue-600 mr-2"
-            >
-              Editar
-            </button>
-            <button
-              (click)="handleDelete(moto.id)"
-              class="text-red-600"
-            >
-              Eliminar
-            </button>
-          </td>
-        </tr>
-        <tr *ngIf="motorcycles.length === 0">
-          <td colspan="6" class="text-center py-4">Sin motocicletas registradas.</td>
-        </tr>
-      </tbody>
-    </table>
-  </ng-template>
 </div>

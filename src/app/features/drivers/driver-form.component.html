@@ -1,0 +1,35 @@
+<div class="card form-card">
+  <h3>Nuevo Conductor</h3>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="grid">
+      <div class="field">
+        <label>Nombre</label>
+        <input type="text" formControlName="nombre" placeholder="Ingresa el nombre" />
+        <small *ngIf="form.controls.nombre.touched && form.controls.nombre.invalid">Nombre es obligatorio.</small>
+      </div>
+      <div class="field">
+        <label>Teléfono</label>
+        <input type="text" formControlName="telefono" placeholder="Ej: 555-1234" />
+        <small *ngIf="form.controls.telefono.touched && form.controls.telefono.invalid">Teléfono válido requerido.</small>
+      </div>
+      <div class="field">
+        <label>Nº Licencia</label>
+        <input type="text" formControlName="licenciaNumero" placeholder="Número de licencia" />
+        <small *ngIf="form.controls.licenciaNumero.touched && form.controls.licenciaNumero.invalid">Licencia requerida.</small>
+      </div>
+      <div class="field">
+        <label>Moto asignada</label>
+        <select formControlName="motoId">
+          <option [ngValue]="null">Selecciona una moto</option>
+          <option *ngFor="let m of motos" [ngValue]="m.id">{{ m.brand }} ({{ m.license_plate }})</option>
+        </select>
+        <small *ngIf="form.controls.motoId.touched && form.controls.motoId.invalid">Selecciona una moto.</small>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn primary" [disabled]="form.invalid">Crear Conductor</button>
+    </div>
+  </form>
+</div>

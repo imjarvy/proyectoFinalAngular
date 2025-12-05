@@ -1,50 +1,99 @@
-<form (submit)="onSubmit($event)" class="space-y-4">
-  <select name="customer_id" [value]="form.customer_id" (change)="onInputChange($event)" required>
-    <option value="">Selecciona Cliente</option>
-    <option *ngFor="let c of customers" [value]="c.id">{{ c.name }}</option>
-  </select>
-  <select name="motorcycle_id" [value]="form.motorcycle_id" (change)="onInputChange($event)" required>
-    <option value="">Selecciona Moto</option>
-    <option *ngFor="let m of motorcycles" [value]="m.id">{{ m.license_plate }}</option>
-  </select>
-  <select name="menu_id" [value]="form.menu_id" (change)="onInputChange($event)" required>
-    <option value="">Selecciona Menú</option>
-    <option *ngFor="let menu of menus" [value]="menu.id">{{ getMenuProductName(menu) }}</option>
-  </select>
-  <input
-    name="quantity"
-    [value]="form.quantity"
-    (input)="onInputChange($event)"
-    placeholder="Cantidad"
-    type="number"
-    min="1"
-    required
-    class="w-full border px-2 py-1 rounded"
-  />
-  <select
-    name="status"
-    [value]="form.status"
-    (change)="onInputChange($event)"
-    required
-    class="w-full border px-2 py-1 rounded"
-  >
-    <option value="">Selecciona Estado</option>
-    <option value="pending">Pendiente</option>
-    <option value="in_progress">En progreso</option>
-    <option value="delivered">Entregado</option>
-    <option value="cancelled">Cancelado</option>
-  </select>
-  <input
-    name="total_price"
-    [value]="form.total_price"
-    (input)="onInputChange($event)"
-    placeholder="Precio Total"
-    type="number"
-    required
-    class="w-full border px-2 py-1 rounded"
-  />
-  <div class="flex gap-2">
-    <button type="submit" class="bg-blue-600 text-white rounded px-3 py-1">Guardar</button>
-    <button type="button" class="bg-gray-300 rounded px-3 py-1" (click)="onCancel()">Cancelar</button>
-  </div>
-</form>
+<div class="order-form-view">
+  <style>
+    .order-form-view { font-family:'Poppins','Segoe UI',system-ui,-apple-system,sans-serif; color:#0f172a; }
+    .form-shell { background:#fff; border-radius:20px; padding:24px; box-shadow:0 18px 40px rgba(15,23,42,0.12); border:1px solid rgba(15,23,42,0.08); position:relative; overflow:hidden; }
+    .form-shell::after { content:""; position:absolute; inset:-72% 60% auto; width:340px; height:340px; background:radial-gradient(circle at center, rgba(99,102,241,0.16), transparent 65%); filter:blur(16px); }
+    .form-body { position:relative; z-index:1; display:grid; gap:14px; }
+    .field { display:flex; flex-direction:column; gap:8px; }
+    .label { font-weight:700; color:#1f2937; }
+    .control { width:100%; border:1px solid rgba(15,23,42,0.12); border-radius:12px; padding:12px 14px; background:#fff; font-weight:600; transition:border-color .18s ease, box-shadow .18s ease; }
+    .control:focus { border-color:#6366f1; box-shadow:0 0 0 3px rgba(99,102,241,0.2); outline:none; }
+    .row { display:grid; grid-template-columns:1fr; gap:14px; }
+    @media(min-width:720px){ .row { grid-template-columns:1fr 1fr; } }
+    .actions { position:relative; z-index:1; display:flex; gap:10px; justify-content:flex-end; margin-top:10px; }
+    .btn { border:none; padding:12px 16px; border-radius:12px; font-weight:700; cursor:pointer; transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease; }
+    .btn-primary { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; box-shadow:0 16px 30px rgba(99,102,241,0.25); }
+    .btn-primary:hover { transform:translateY(-2px); box-shadow:0 20px 40px rgba(99,102,241,0.32); }
+    .btn-secondary { background:rgba(15,23,42,0.07); color:#0f172a; }
+    .btn-secondary:hover { transform:translateY(-2px); box-shadow:0 12px 24px rgba(15,23,42,0.12); }
+  </style>
+
+  <form (submit)="onSubmit($event)" class="form-shell">
+    <div class="form-body">
+      <div class="field">
+        <label class="label">Cliente</label>
+        <select name="customer_id" class="control" [value]="form.customer_id" (change)="onInputChange($event)" required>
+          <option value="">Selecciona Cliente</option>
+          <option *ngFor="let c of customers" [value]="c.id">{{ c.name }}</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label class="label">Moto</label>
+          <select name="motorcycle_id" class="control" [value]="form.motorcycle_id" (change)="onInputChange($event)" required>
+            <option value="">Selecciona Moto</option>
+            <option *ngFor="let m of motorcycles" [value]="m.id">{{ m.license_plate }}</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="label">Menú</label>
+          <select name="menu_id" class="control" [value]="form.menu_id" (change)="onInputChange($event)" required>
+            <option value="">Selecciona Menú</option>
+            <option *ngFor="let menu of menus" [value]="menu.id">{{ getMenuProductName(menu) }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label class="label">Cantidad</label>
+          <input
+            name="quantity"
+            class="control"
+            [value]="form.quantity"
+            (input)="onInputChange($event)"
+            placeholder="Cantidad"
+            type="number"
+            min="1"
+            required
+          />
+        </div>
+        <div class="field">
+          <label class="label">Estado</label>
+          <select
+            name="status"
+            class="control"
+            [value]="form.status"
+            (change)="onInputChange($event)"
+            required
+          >
+            <option value="">Selecciona Estado</option>
+            <option value="pending">Pendiente</option>
+            <option value="in_progress">En progreso</option>
+            <option value="delivered">Entregado</option>
+            <option value="cancelled">Cancelado</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Precio Total</label>
+        <input
+          name="total_price"
+          class="control"
+          [value]="form.total_price"
+          (input)="onInputChange($event)"
+          placeholder="Precio Total"
+          type="number"
+          required
+        />
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancelar</button>
+      <button type="submit" class="btn btn-primary">Guardar</button>
+    </div>
+  </form>
+</div>

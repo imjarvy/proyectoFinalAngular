@@ -1,0 +1,37 @@
+<div class="driver-detail-view" *ngIf="driver as d; else loadingTpl">
+  <div class="card">
+    <div class="header">
+      <h2 class="title">Conductor #{{ d.id }} — {{ d.nombre }}</h2>
+      <span class="badge" [ngClass]="{
+        'badge-success': d.estado==='activo',
+        'badge-warn': d.estado==='suspendido',
+        'badge-muted': d.estado==='inactivo'
+      }">{{ d.estado }}</span>
+    </div>
+
+    <div class="grid">
+      <div><strong>Cédula:</strong> {{ d.cedula }}</div>
+      <div><strong>Teléfono:</strong> {{ d.telefono }}</div>
+      <div><strong>Licencia:</strong> {{ d.licencia.tipo }} — {{ d.licencia.numero }}</div>
+      <div><strong>Vence:</strong> {{ d.licencia.vencimiento | date:'yyyy-MM-dd' }}</div>
+      <div><strong>Moto asignada:</strong> {{ d.motoId || '—' }}</div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" (click)="openAssignModal()">Asignar moto</button>
+    </div>
+
+    <div class="assign" *ngIf="availableMotos.length > 0">
+      <select class="control" [(ngModel)]="selectedMoto">
+        <option value="">Selecciona moto</option>
+        <option *ngFor="let m of availableMotos" [value]="m.id">{{ m.license_plate }}</option>
+      </select>
+      <button class="btn-primary" (click)="assign()">Asignar</button>
+    </div>
+  </div>
+</div>
+
+<ng-template #loadingTpl>
+  <div *ngIf="loading" class="state-card state-loading">Cargando...</div>
+  <div *ngIf="error" class="state-card state-error">{{ error }}</div>
+</ng-template>

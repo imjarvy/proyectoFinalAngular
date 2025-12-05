@@ -28,4 +28,10 @@ export class MotorcycleService {
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/${id}`);
   }
+
+  // Lista motos disponibles para asignación
+  getAvailable(): Observable<Motorcycle[]> {
+    // Endpoint esperado: GET /motorcycles/available
+    return this.http.get<Motorcycle[]>(`${this.base}/available`);
+  }
 }

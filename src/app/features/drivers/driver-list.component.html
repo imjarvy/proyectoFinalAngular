@@ -1,0 +1,43 @@
+<div class="card">
+  <div class="card-header">
+    <h3>Conductores</h3>
+    <button class="btn" (click)="goNew()">Añadir Conductor</button>
+  </div>
+
+  <div *ngIf="loading" class="state">Cargando conductores...</div>
+  <div *ngIf="error" class="state error">{{ error }}</div>
+
+  <table class="table" *ngIf="!loading && !error">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Teléfono</th>
+        <th>Licencia</th>
+        <th>Moto</th>
+        <th style="width:160px">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let d of drivers">
+        <td>{{ d.nombre }}</td>
+        <td>{{ d.telefono }}</td>
+        <td>{{ d.licencia?.numero }}</td>
+        <td>
+          <ng-container *ngIf="d.motoId as id; else sinMoto">
+            <span class="chip">
+              {{ motosById.get(id)?.brand || '—' }}
+              ({{ motosById.get(id)?.license_plate || '—' }})
+            </span>
+          </ng-container>
+          <ng-template #sinMoto>
+            <span class="chip muted">Sin moto</span>
+          </ng-template>
+        </td>
+        <td>
+          <button class="btn" (click)="edit(d)">Editar</button>
+          <button class="btn danger" (click)="remove(d)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

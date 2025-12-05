@@ -1,46 +1,98 @@
-<div class="p-4 max-w-3xl mx-auto">
-  <h2 class="text-2xl font-bold mb-4">Pedidos Restaurante</h2>
+<div class="orders-view max-w-4xl mx-auto p-6">
+  <style>
+    .orders-view { font-family:'Poppins','Segoe UI',system-ui,-apple-system,sans-serif; color:#0f172a; }
+    .orders-card { background:#fff; border-radius:18px; padding:24px; box-shadow:0 18px 40px rgba(15,23,42,0.12); border:1px solid rgba(15,23,42,0.06); position:relative; overflow:hidden; }
+    .orders-card::after { content:""; position:absolute; inset:-70% 65% auto; width:320px; height:320px; background:radial-gradient(circle at center, rgba(37,99,235,0.16), transparent 65%); filter:blur(14px); pointer-events:none; }
+    .orders-header { position:relative; z-index:1; margin-bottom:22px; }
+    .orders-title { font-size:1.875rem; font-weight:800; margin-bottom:6px; }
+    .orders-sub { color:#6b7280; font-size:0.95rem; }
+    .filter-bar { position:relative; z-index:1; display:flex; flex-wrap:wrap; gap:14px; align-items:center; background:#f8fafc; padding:14px 16px; border-radius:12px; border:1px solid rgba(15,23,42,0.08); margin-bottom:20px; }
+    .filter-label { font-weight:600; color:#1f2937; }
+    .filter-select { min-width:180px; border:1px solid rgba(15,23,42,0.12); border-radius:10px; padding:10px 12px; background:#fff; font-weight:500; transition:border-color .18s ease, box-shadow .18s ease; }
+    .filter-select:focus { border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,0.18); outline:none; }
+    .state-info { position:relative; z-index:1; padding:12px 16px; border-radius:12px; border:1px dashed rgba(37,99,235,0.22); background:rgba(37,99,235,0.06); color:#1d4ed8; font-weight:600; margin-bottom:20px; }
+    .error-info { position:relative; z-index:1; padding:12px 16px; border-radius:12px; border:1px solid rgba(239,68,68,0.22); background:rgba(239,68,68,0.08); color:#b91c1c; font-weight:600; margin-bottom:18px; }
+    .orders-table { width:100%; border-collapse:separate; border-spacing:0; border-radius:16px; overflow:hidden; position:relative; z-index:1; box-shadow:0 14px 28px rgba(15,23,42,0.08); }
+    .orders-table thead th { background:linear-gradient(90deg,#1e3a8a,#2563eb); color:#fff; padding:14px 16px; text-align:left; font-size:0.75rem; letter-spacing:0.08em; text-transform:uppercase; font-weight:700; }
+    .orders-table tbody td { background:#fff; padding:14px 16px; border-bottom:1px solid rgba(15,23,42,0.06); color:#334155; }
+    .orders-table tbody tr:nth-child(even) td { background:#f8fafc; }
+    .orders-table tbody tr:hover td { background:rgba(37,99,235,0.08); }
+    .cell-right { text-align:right; }
+    .cell-center { text-align:center; }
+    .cell-strong { font-weight:700; color:#0f172a; }
+    .status-pill { display:inline-flex; align-items:center; justify-content:center; padding:6px 12px; border-radius:999px; font-weight:600; font-size:0.82rem; text-transform:capitalize; }
+    .status-pending { background:rgba(250,204,21,0.18); color:#b45309; }
+    .status-progress { background:rgba(59,130,246,0.18); color:#1d4ed8; }
+    .status-delivered { background:rgba(16,185,129,0.18); color:#0f766e; }
+    .status-cancelled { background:rgba(248,113,113,0.18); color:#b91c1c; }
+    @media(max-width:720px){
+      .orders-card { padding:18px; }
+      .orders-table, .orders-table thead, .orders-table tbody, .orders-table th, .orders-table td, .orders-table tr { display:block; }
+      .orders-table thead { display:none; }
+      .orders-table tbody tr { margin-bottom:12px; border:1px solid rgba(15,23,42,0.08); border-radius:12px; overflow:hidden; box-shadow:0 12px 24px rgba(15,23,42,0.08); }
+      .orders-table tbody td { display:flex; justify-content:space-between; align-items:center; padding:12px 14px; }
+      .orders-table tbody td::before { content:attr(data-label); font-weight:700; color:#0f172a; text-transform:uppercase; letter-spacing:0.06em; font-size:0.7rem; }
+      .cell-right { text-align:right; }
+    }
+  </style>
 
-  <div class="mb-4 flex gap-4 items-center">
-    <label class="font-semibold">Filtrar por estado:</label>
-    <select
-      [value]="estadoFiltro"
-      (change)="setEstadoFiltro($event)"
-      class="border rounded p-2"
-    >
-      <option *ngFor="let opt of ESTADOS" [value]="opt.value">{{ opt.label }}</option>
-    </select>
-  </div>
+  <div class="orders-card">
+    <div class="orders-header">
+      <h2 class="orders-title">Pedidos del Restaurante</h2>
+      <p class="orders-sub">Administra tus órdenes con una vista clara y estilizada</p>
+    </div>
 
-  <div *ngIf="loading">
-    Cargando pedidos...
+    <div class="filter-bar">
+      <span class="filter-label">Filtrar por estado</span>
+      <select
+        [value]="estadoFiltro"
+        (change)="setEstadoFiltro($event)"
+        class="filter-select"
+      >
+        <option *ngFor="let opt of ESTADOS" [value]="opt.value">{{ opt.label }}</option>
+      </select>
+    </div>
+
+    <div *ngIf="loading" class="state-info">
+      Cargando pedidos...
+    </div>
+    <div *ngIf="error" class="error-info">
+      {{ error }}
+    </div>
+    <div *ngIf="!loading && !error && pedidosFiltrados.length === 0" class="state-info" style="background:rgba(79,70,229,0.08); color:#4338ca; border-color:rgba(79,70,229,0.22);">
+      No hay pedidos para mostrar.
+    </div>
+    <table *ngIf="!loading && !error && pedidosFiltrados.length > 0" class="orders-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Cliente</th>
+          <th>Menú</th>
+          <th>Cantidad</th>
+          <th>Estado</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of pedidosFiltrados">
+          <td class="cell-strong" data-label="ID">{{ order.id }}</td>
+          <td data-label="Cliente">{{ getCustomerName(order.customer_id) }}</td>
+          <td data-label="Menú">{{ getMenuName(order.menu_id) }}</td>
+          <td class="cell-center" data-label="Cantidad">{{ order.quantity }}</td>
+          <td class="cell-center" data-label="Estado">
+            <span class="status-pill"
+                  [ngClass]="{
+                    'status-pending': order.status === 'pending',
+                    'status-progress': order.status === 'in_progress',
+                    'status-delivered': order.status === 'delivered',
+                    'status-cancelled': order.status === 'cancelled'
+                  }">
+              {{ order.status }}
+            </span>
+          </td>
+          <td class="cell-right cell-strong" data-label="Total">{{ order.total_price }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-  <div *ngIf="error" class="text-red-500">
-    {{ error }}
-  </div>
-  <div *ngIf="!loading && !error && pedidosFiltrados.length === 0">
-    No hay pedidos para mostrar.
-  </div>
-  <table *ngIf="!loading && !error && pedidosFiltrados.length > 0" class="min-w-full bg-white rounded shadow">
-    <thead>
-      <tr>
-        <th class="px-2 py-2">ID</th>
-        <th class="px-2 py-2">Cliente</th>
-        <th class="px-2 py-2">Menú</th>
-        <th class="px-2 py-2">Cantidad</th>
-        <th class="px-2 py-2">Estado</th>
-        <th class="px-2 py-2">Total</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let order of pedidosFiltrados" class="border-b hover:bg-gray-50">
-        <td class="px-2 py-2">{{ order.id }}</td>
-        <td class="px-2 py-2">{{ getCustomerName(order.customer_id) }}</td>
-        <td class="px-2 py-2">{{ getMenuName(order.menu_id) }}</td>
-        <td class="px-2 py-2">{{ order.quantity }}</td>
-        <td class="px-2 py-2">{{ order.status }}</td>
-        <td class="px-2 py-2">{{ order.total_price }}</td>
-      </tr>
-    </tbody>
-  </table>
 </div>

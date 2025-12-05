@@ -16,6 +16,7 @@ export class AdminLayoutComponent {
     { route: '/dashboard/admin/restaurants', label: 'Restaurantes' },
     { route: '/dashboard/admin/customers',  label: 'Clientes' },
     { route: '/dashboard/admin/motorcycles', label: 'Motos' },
+    { route: '/dashboard/admin/conductores', label: 'Conductores' },
     { route: '/dashboard/admin/issues', label: 'Incidencias' }
   ];
 

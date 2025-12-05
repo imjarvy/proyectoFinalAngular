@@ -1,0 +1,67 @@
+<div class="drivers-view">
+  <div class="header-bar">
+    <h2 class="title">Conductores</h2>
+    <div class="actions">
+      <a class="btn-primary" [routerLink]="['/dashboard/admin/conductores/new']">Nuevo Conductor</a>
+    </div>
+  </div>
+
+  <div class="filters">
+    <input class="control" [ngModel]="q()" (ngModelChange)="q.set($event)" placeholder="Buscar por nombre, cédula o teléfono" />
+    <select class="control" [ngModel]="estado()" (ngModelChange)="estado.set($event)">
+      <option value="">Todos</option>
+      <option value="activo">Activo</option>
+      <option value="inactivo">Inactivo</option>
+      <option value="suspendido">Suspendido</option>
+    </select>
+  </div>
+
+  <div *ngIf="loading()" class="state-card state-loading">Cargando...</div>
+  <div *ngIf="error()" class="state-card state-error">{{ error() }}</div>
+
+  <div class="table-card">
+    <div class="inner">
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Cédula</th>
+            <th>Teléfono</th>
+            <th>Estado</th>
+            <th>Moto</th>
+            <th class="cell-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="paginated().length === 0">
+            <td colspan="6" class="empty-row">No hay resultados</td>
+          </tr>
+          <tr *ngFor="let d of paginated()">
+            <td class="cell-strong" data-label="Nombre">{{ d.nombre }}</td>
+            <td class="cell-muted" data-label="Cédula">{{ d.cedula }}</td>
+            <td class="cell-muted" data-label="Teléfono">{{ d.telefono }}</td>
+            <td data-label="Estado">
+              <span class="badge" [ngClass]="{
+                'badge-success': d.estado==='activo',
+                'badge-warn': d.estado==='suspendido',
+                'badge-muted': d.estado==='inactivo'
+              }">{{ d.estado }}</span>
+            </td>
+            <td class="cell-muted" data-label="Moto">{{ d.motoId || '—' }}</td>
+            <td class="actions" data-label="Acciones">
+              <a class="chip-btn chip-edit" [routerLink]="['/dashboard/admin/conductores', d.id]">Ver</a>
+              <a class="chip-btn chip-edit" [routerLink]="['/dashboard/admin/conductores/edit', d.id]">Editar</a>
+              <button class="chip-btn chip-delete" (click)="onDelete(d.id)">Eliminar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="pagination" *ngIf="filtered().length > pageSize()">
+    <button class="pager" [disabled]="page()===1" (click)="page.set(page()-1)">Anterior</button>
+    <span class="pager-info">Página {{ page() }} / {{ totalPages() }}</span>
+    <button class="pager" [disabled]="page()===totalPages()" (click)="page.set(page()+1)">Siguiente</button>
+  </div>
+</div>

@@ -1,0 +1,9 @@
+<div class="card">
+  <div class="header">
+    <h3>Seguimiento del Pedido</h3>
+    <span class="status" [class.socket]="estadoRealtime==='socket'" [class.polling]="estadoRealtime==='polling'">
+      {{ estadoRealtime==='socket' ? 'Tiempo real (socket)' : estadoRealtime==='polling' ? 'Sin realtime — usando polling' : 'Idle' }}
+    </span>
+  </div>
+  <div id="map" class="map"></div>
+</div>

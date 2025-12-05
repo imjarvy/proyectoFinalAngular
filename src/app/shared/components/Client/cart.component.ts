@@ -12,6 +12,7 @@ import { UserStorageManager } from '../../../core/utils/storage-manager';
   standalone: true,
   selector: 'app-cart',
   templateUrl: './cart.component.html',
+  styleUrls: ['./cart.component.css'],
   imports: [CommonModule, FormsModule]
 })
 export class CartComponent implements OnInit {

@@ -1,0 +1,65 @@
+<div class="driver-form-view">
+  <form class="form-shell" (ngSubmit)="onSubmit()">
+    <div class="form-header">
+      <h2 class="form-title">{{ id ? 'Editar Conductor' : 'Nuevo Conductor' }}</h2>
+      <p class="form-sub">Completa los datos del conductor</p>
+    </div>
+
+    <div *ngIf="error" class="error-card">{{ error }}</div>
+
+    <div class="form-grid">
+      <div class="field">
+        <label>Nombre</label>
+        <input class="control" formControlName="nombre" placeholder="Ej. Carlos Pérez" />
+      </div>
+
+      <div class="field">
+        <label>Cédula</label>
+        <input class="control" formControlName="cedula" placeholder="Ej. 123456789" />
+      </div>
+
+      <div class="field">
+        <label>Teléfono</label>
+        <input class="control" formControlName="telefono" placeholder="Ej. +57 300 123 4567" />
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label>Número Licencia</label>
+          <input class="control" formControlName="licencia.numero" />
+        </div>
+        <div class="field">
+          <label>Tipo Licencia</label>
+          <input class="control" formControlName="licencia.tipo" placeholder="Ej. A2" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Vencimiento Licencia</label>
+        <input type="date" class="control" formControlName="licencia.vencimiento" />
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label>Estado</label>
+          <select class="control" formControlName="estado">
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+            <option value="suspendido">Suspendido</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Moto asignada (opcional)</label>
+          <select class="control" formControlName="motoId">
+            <option [ngValue]="null">Sin asignar</option>
+            <option *ngFor="let m of motosDisponibles" [ngValue]="m.id">{{ m.license_plate }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn-primary" [disabled]="loading">Guardar</button>
+    </div>
+  </form>
+</div>

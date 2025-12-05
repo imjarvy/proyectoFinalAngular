@@ -1,51 +1,85 @@
-<form (ngSubmit)="onSubmit()" class="bg-white p-6 rounded shadow max-w-md mx-auto">
-  <h2 class="text-xl font-bold mb-4">
-    {{ initialData.id ? 'Editar Cliente' : 'Crear Cliente' }}
-  </h2>
-  <div class="mb-4">
-    <label class="block font-semibold">Nombre</label>
-    <input
-      type="text"
-      name="name"
-      [(ngModel)]="formData.name"
-      class="border rounded w-full p-2"
-    />
-    <div *ngIf="errors.name" class="text-red-500 text-sm">{{ errors.name }}</div>
-  </div>
-  <div class="mb-4">
-    <label class="block font-semibold">Email</label>
-    <input
-      type="email"
-      name="email"
-      [(ngModel)]="formData.email"
-      class="border rounded w-full p-2"
-    />
-    <div *ngIf="errors.email" class="text-red-500 text-sm">{{ errors.email }}</div>
-  </div>
-  <div class="mb-4">
-    <label class="block font-semibold">Teléfono</label>
-    <input
-      type="text"
-      name="phone"
-      [(ngModel)]="formData.phone"
-      class="border rounded w-full p-2"
-    />
-    <div *ngIf="errors.phone" class="text-red-500 text-sm">{{ errors.phone }}</div>
-  </div>
-  <div class="flex justify-end space-x-2">
-    <button
-      type="button"
-      (click)="onCancel()"
-      class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded"
-    >
-      Cancelar
-    </button>
-    <button
-      type="submit"
-      [disabled]="loading"
-      class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-    >
-      {{ loading ? 'Guardando...' : 'Guardar' }}
-    </button>
-  </div>
-</form>
+<div class="customer-form-view">
+  <style>
+    .customer-form-view { font-family:'Poppins','Segoe UI',system-ui,-apple-system,sans-serif; color:#0f172a; }
+    .form-shell { max-width:480px; margin:0 auto; background:#fff; border-radius:20px; padding:28px; box-shadow:0 18px 40px rgba(15,23,42,0.12); border:1px solid rgba(15,23,42,0.08); position:relative; overflow:hidden; }
+    .form-shell::after { content:""; position:absolute; inset:-70% 55% auto; width:320px; height:320px; background:radial-gradient(circle at center, rgba(59,130,246,0.16), transparent 65%); filter:blur(14px); }
+    .form-header { position:relative; z-index:1; margin-bottom:18px; }
+    .form-title { font-size:1.6rem; font-weight:800; margin-bottom:6px; }
+    .form-sub { color:#6b7280; font-weight:500; }
+    .form-body { position:relative; z-index:1; display:grid; gap:16px; }
+    .field { display:flex; flex-direction:column; gap:8px; }
+    .field label { font-weight:700; letter-spacing:0.01em; }
+    .control { border:1px solid rgba(15,23,42,0.12); border-radius:12px; padding:12px 14px; background:#fff; font-weight:600; transition:border-color .18s ease, box-shadow .18s ease; }
+    .control:focus { border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,0.18); outline:none; }
+    .error { color:#b91c1c; font-weight:600; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.18); padding:8px 10px; border-radius:10px; font-size:0.9rem; }
+    .actions { display:flex; justify-content:flex-end; gap:10px; margin-top:6px; position:relative; z-index:1; }
+    .btn { border:none; padding:12px 16px; border-radius:12px; font-weight:700; cursor:pointer; transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease; }
+    .btn:disabled { opacity:0.6; cursor:not-allowed; box-shadow:none; }
+    .btn-secondary { background:rgba(15,23,42,0.07); color:#0f172a; }
+    .btn-secondary:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 12px 24px rgba(15,23,42,0.12); }
+    .btn-primary { background:linear-gradient(135deg,#2563eb,#7c3aed); color:#fff; box-shadow:0 16px 30px rgba(37,99,235,0.25); }
+    .btn-primary:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 20px 40px rgba(124,58,237,0.28); }
+  </style>
+
+  <form (ngSubmit)="onSubmit()" class="form-shell">
+    <div class="form-header">
+      <h2 class="form-title">{{ initialData.id ? 'Editar Cliente' : 'Crear Cliente' }}</h2>
+      <p class="form-sub">Completa la información del cliente para guardarla en el sistema</p>
+    </div>
+
+    <div class="form-body">
+      <div class="field">
+        <label>Nombre</label>
+        <input
+          type="text"
+          name="name"
+          [(ngModel)]="formData.name"
+          class="control"
+          placeholder="Ej. Ana Martínez"
+        />
+        <div *ngIf="errors.name" class="error">{{ errors.name }}</div>
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input
+          type="email"
+          name="email"
+          [(ngModel)]="formData.email"
+          class="control"
+          placeholder="correo@ejemplo.com"
+        />
+        <div *ngIf="errors.email" class="error">{{ errors.email }}</div>
+      </div>
+
+      <div class="field">
+        <label>Teléfono</label>
+        <input
+          type="text"
+          name="phone"
+          [(ngModel)]="formData.phone"
+          class="control"
+          placeholder="Ej. +57 300 123 4567"
+        />
+        <div *ngIf="errors.phone" class="error">{{ errors.phone }}</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button
+        type="button"
+        (click)="onCancel()"
+        class="btn btn-secondary"
+      >
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        [disabled]="loading"
+        class="btn btn-primary"
+      >
+        {{ loading ? 'Guardando...' : 'Guardar' }}
+      </button>
+    </div>
+  </form>
+</div>

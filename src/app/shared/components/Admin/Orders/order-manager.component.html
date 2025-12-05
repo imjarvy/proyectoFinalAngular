@@ -1,12 +1,26 @@
-<div class="p-4">
-  <h2 class="text-2xl font-bold mb-4">Pedidos (Admin)</h2>
+<div class="orders-admin-view">
+  <style>
+    .orders-admin-view { font-family:'Poppins','Segoe UI',system-ui,-apple-system,sans-serif; color:#0f172a; padding:16px; }
+    .header-bar { display:flex; justify-content:space-between; align-items:center; gap:14px; margin-bottom:16px; }
+    .title { font-size:1.75rem; font-weight:800; }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; }
+    .btn-primary { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; padding:12px 16px; border-radius:12px; font-weight:700; border:none; cursor:pointer; box-shadow:0 16px 30px rgba(99,102,241,0.25); transition:transform .18s ease, box-shadow .18s ease; }
+    .btn-primary:hover { transform:translateY(-2px); box-shadow:0 20px 40px rgba(99,102,241,0.32); }
+    .btn-ghost { background:rgba(15,23,42,0.06); color:#0f172a; padding:12px 16px; border-radius:12px; font-weight:700; border:none; cursor:pointer; transition:transform .18s ease, box-shadow .18s ease; }
+    .btn-ghost:hover { transform:translateY(-2px); box-shadow:0 12px 24px rgba(15,23,42,0.12); }
+    .state-card { margin-top:12px; padding:12px 16px; border-radius:12px; }
+    .state-loading { border:1px dashed rgba(37,99,235,0.22); background:rgba(37,99,235,0.06); color:#1d4ed8; font-weight:600; }
+    .state-error { border:1px solid rgba(239,68,68,0.22); background:rgba(239,68,68,0.08); color:#b91c1c; font-weight:700; }
+    @media(max-width:720px){ .header-bar { flex-direction:column; align-items:flex-start; } }
+  </style>
 
-  <button
-    class="mb-4 bg-green-600 text-white px-4 py-2 rounded"
-    (click)="handleCreate()"
-  >
-    Nuevo Pedido
-  </button>
+  <div class="header-bar">
+    <h2 class="title">Pedidos (Admin)</h2>
+    <div class="actions">
+      <button class="btn-primary" (click)="handleCreate()">Crear Pedido</button>
+      <button class="btn-ghost" (click)="handleCreate()">Pedir Pedido</button>
+    </div>
+  </div>
 
   <app-order-list
     [orders]="orders"
@@ -17,22 +31,12 @@
     (deleteOrder)="handleDelete($event)">
   </app-order-list>
 
-  <div
-    *ngIf="loading"
-    class="mb-4 text-gray-500">
-    Cargando pedidos...
-  </div>
-  <div
-    *ngIf="error"
-    style="color: red;">
-    {{ error }}
-  </div>
+  <div *ngIf="loading" class="state-card state-loading">Cargando pedidos...</div>
+  <div *ngIf="error" class="state-card state-error">{{ error }}</div>
 
   <div *ngIf="showForm" class="fixed z-20 left-0 top-0 w-full h-full flex items-center justify-center bg-black bg-opacity-30">
     <div class="bg-white rounded shadow-lg p-8 relative w-full max-w-lg">
-      <h3 class="text-xl font-bold mb-4">
-        {{ editingOrder ? 'Editar Pedido' : 'Nuevo Pedido' }}
-      </h3>
+      <h3 class="text-xl font-bold mb-4">{{ editingOrder ? 'Editar Pedido' : 'Nuevo Pedido' }}</h3>
       <app-order-form-container
         [order]="editingOrder"
         [customers]="customers"
@@ -43,10 +47,7 @@
         (cancel)="handleCancel()"
       >
       </app-order-form-container>
-      <button
-        class="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-        (click)="handleCancel()"
-      >✕</button>
+      <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" (click)="handleCancel()">✕</button>
     </div>
   </div>
 </div>

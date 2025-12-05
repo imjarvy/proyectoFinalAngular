@@ -1,0 +1,50 @@
+<div class="card">
+  <h2 class="title">Mi Moto</h2>
+  <p class="subtitle">Gestiona la moto asignada y asigna una nueva.</p>
+
+  <div *ngIf="loading" class="state">Cargando información...</div>
+  <div *ngIf="error" class="state error">{{ error }}</div>
+  <div *ngIf="success" class="state success">{{ success }}</div>
+
+  <div class="assign">
+    <label>Asignar moto</label>
+    <form [formGroup]="form" (ngSubmit)="assignMoto()" class="assign-form" novalidate>
+      <select formControlName="driverId" class="driver-select">
+        <option [ngValue]="null">Selecciona un conductor</option>
+        <option *ngFor="let d of drivers" [ngValue]="d.id">{{ d.nombre }} ({{ d.telefono }})</option>
+      </select>
+      <select formControlName="motoId">
+        <option [ngValue]="null">Selecciona una moto</option>
+        <option *ngFor="let m of motos" [ngValue]="m.id">{{ m.brand }} ({{ m.license_plate }})</option>
+      </select>
+      <button type="submit" class="btn primary">Añadir Moto</button>
+    </form>
+  </div>
+
+  <div class="table-wrap" *ngIf="assignedMoto">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Placa</th>
+          <th>Marca</th>
+          <th>Año</th>
+          <th>Estado</th>
+          <th>Creada</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ assignedMoto.license_plate }}</td>
+          <td>{{ assignedMoto.brand }}</td>
+          <td>{{ assignedMoto.year }}</td>
+          <td>{{ assignedMoto.status }}</td>
+          <td>{{ assignedMoto.created_at || '—' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="empty" *ngIf="!assignedMoto && !loading && !error">
+    <p>Sin moto asignada actualmente.</p>
+  </div>
+</div>

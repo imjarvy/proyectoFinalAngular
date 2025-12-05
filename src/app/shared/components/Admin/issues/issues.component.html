@@ -1,42 +1,85 @@
-<div>
-  <h2 class="text-2xl font-bold mb-4">Gestión de Incidencias</h2>
-  <button
-    class="mb-4 bg-green-600 text-white px-4 py-2 rounded"
-    (click)="handleCreate()"
-  >
-    Nuevo Issue
-  </button>
-  <table class="min-w-full bg-white rounded shadow">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Motocicleta</th>
-        <th>Descripción</th>
-        <th>Tipo</th>
-        <th>Fecha</th>
-        <th>Estado</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let issue of issues">
-        <td>{{ issue.id }}</td>
-        <td>
-          {{ findMotorcycle(issue.motorcycle_id)?.license_plate || '—' }}
-        </td>
-        <td>{{ issue.description }}</td>
-        <td>{{ issue.issue_type }}</td>
-        <td>{{ issue.date_reported }}</td>
-        <td>
-          <select
-            [ngModel]="issue.status"
-            (ngModelChange)="handleStatusChange(issue.id, $event)"
-          >
-            <option *ngFor="let st of statusOptions" [value]="st">{{ st }}</option>
-          </select>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+<div class="issues-view max-w-5xl mx-auto p-6">
+  <style>
+    .issues-view { font-family:'Poppins','Segoe UI',system-ui,-apple-system,sans-serif; color:#0f172a; }
+    .issues-card { background:#fff; border-radius:20px; padding:28px; box-shadow:0 20px 44px rgba(15,23,42,0.12); border:1px solid rgba(15,23,42,0.06); position:relative; overflow:hidden; }
+    .issues-card::after { content:""; position:absolute; inset:-80% 70% auto; width:360px; height:360px; background:radial-gradient(circle at center, rgba(16,185,129,0.18), transparent 65%); filter:blur(16px); pointer-events:none; }
+    .issues-header { position:relative; z-index:1; margin-bottom:24px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:18px; align-items:center; }
+    .issues-title { font-size:1.95rem; font-weight:800; margin:0; }
+    .issues-sub { color:#64748b; font-size:0.95rem; }
+    .btn-create { background:linear-gradient(135deg,#10b981,#22d3ee); color:#fff; padding:12px 18px; border:none; border-radius:12px; font-weight:700; box-shadow:0 16px 32px rgba(16,185,129,0.24); transition:transform .18s ease, box-shadow .18s ease; }
+    .btn-create:hover { transform:translateY(-2px); box-shadow:0 20px 40px rgba(16,185,129,0.28); }
+    .issues-table { width:100%; border-collapse:separate; border-spacing:0; border-radius:18px; overflow:hidden; position:relative; z-index:1; box-shadow:0 16px 32px rgba(15,23,42,0.1); }
+    .issues-table thead th { background:linear-gradient(90deg,#0f766e,#14b8a6); color:#fff; padding:14px 16px; text-align:left; font-size:0.76rem; letter-spacing:0.08em; text-transform:uppercase; font-weight:700; }
+    .issues-table tbody td { background:#fff; padding:14px 16px; border-bottom:1px solid rgba(15,23,42,0.06); color:#334155; }
+    .issues-table tbody tr:nth-child(even) td { background:#f8fafc; }
+    .issues-table tbody tr:hover td { background:rgba(14,165,233,0.08); }
+    .cell-muted { color:#6b7280; }
+    .cell-strong { font-weight:700; color:#0f172a; }
+    .cell-right { text-align:right; }
+    .status-select { border:1px solid rgba(15,23,42,0.12); border-radius:10px; padding:8px 10px; background:#fff; font-weight:600; color:#0f172a; transition:border-color .18s ease, box-shadow .18s ease; }
+    .status-select:focus { border-color:#0f766e; box-shadow:0 0 0 3px rgba(20,184,166,0.2); outline:none; }
+    .badge { display:inline-flex; align-items:center; justify-content:center; padding:6px 12px; border-radius:999px; font-weight:600; font-size:0.82rem; text-transform:capitalize; }
+    .badge-date { background:rgba(37,99,235,0.12); color:#1d4ed8; }
+    .modal-overlay { background:rgba(15,23,42,0.45); }
+    @media(max-width:768px){
+      .issues-card { padding:22px; }
+      .issues-table, .issues-table thead, .issues-table tbody, .issues-table th, .issues-table td, .issues-table tr { display:block; }
+      .issues-table thead { display:none; }
+      .issues-table tbody tr { margin-bottom:12px; border:1px solid rgba(15,23,42,0.08); border-radius:14px; overflow:hidden; box-shadow:0 14px 28px rgba(15,23,42,0.08); }
+      .issues-table tbody td { display:flex; justify-content:space-between; align-items:center; padding:12px 14px; }
+      .issues-table tbody td::before { content:attr(data-label); font-weight:700; color:#0f172a; text-transform:uppercase; letter-spacing:0.06em; font-size:0.7rem; }
+      .cell-right { text-align:right; }
+    }
+  </style>
+
+  <div class="issues-card">
+    <div class="issues-header">
+      <div>
+        <h2 class="issues-title">Gestión de Incidencias</h2>
+        <p class="issues-sub">Visualiza, actualiza y crea incidencias de forma rápida</p>
+      </div>
+      <button
+        class="btn-create"
+        (click)="handleCreate()"
+      >
+        Nuevo Issue
+      </button>
+    </div>
+
+    <table class="issues-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Motocicleta</th>
+          <th>Descripción</th>
+          <th>Tipo</th>
+          <th>Fecha</th>
+          <th class="cell-center">Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let issue of issues">
+          <td class="cell-strong" data-label="ID">{{ issue.id }}</td>
+          <td class="cell-strong" data-label="Motocicleta">
+            {{ findMotorcycle(issue.motorcycle_id)?.license_plate || '—' }}
+          </td>
+          <td class="cell-muted" data-label="Descripción">{{ issue.description }}</td>
+          <td class="cell-muted" data-label="Tipo">{{ issue.issue_type }}</td>
+          <td class="cell-center" data-label="Fecha">
+            <span class="badge badge-date">{{ issue.date_reported }}</span>
+          </td>
+          <td class="cell-center" data-label="Estado">
+            <select
+              [ngModel]="issue.status"
+              (ngModelChange)="handleStatusChange(issue.id, $event)"
+              class="status-select"
+            >
+              <option *ngFor="let st of statusOptions" [value]="st">{{ st }}</option>
+            </select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
   <ng-container *ngIf="showForm">
     <div

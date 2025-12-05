@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   selector: 'app-orders',
   templateUrl: './orders.component.html',
+  styleUrls: ['./orders.component.css'],
   imports: [CommonModule, FormsModule]
 })
 export class OrdersComponent implements OnInit {

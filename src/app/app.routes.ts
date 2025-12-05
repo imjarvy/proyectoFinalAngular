@@ -5,6 +5,7 @@ import { AdminLayoutComponent } from './core/layouts/admin-layout.component';
 import { OrdersComponent } from './shared/components/Client/orders.component';
 import { CartComponent } from './shared/components/Client/cart.component';
 import { ProfileComponent } from './shared/components/Client/profile.component';
+import { MapConsumerComponent } from './shared/components/Client/map-consumer.component';
 import { MicrosoftAuthPageComponent } from './shared/components/auth/microsoft-auth-page.component';
 import { SignInComponent } from './shared/components/auth/sign-in.component';
 import { authGuard } from './core/guards/auth.guard';
@@ -20,6 +21,15 @@ import { OrderManagerComponent } from './shared/components/Admin/Orders/order-ma
 import { RestaurantChartsComponent } from './shared/components/restaurant/restaurant-charts.component';
 import { RestaurantOrdersComponent } from './shared/components/restaurant/restaurant-orders.component';
 import { RestaurantMenuComponent } from './shared/components/restaurant/restaurant-menu.component';
+import { ConductoresListComponent } from './features/conductores/list/list.component';
+import { ConductoresFormComponent } from './features/conductores/form/form.component';
+import { ConductoresDetailComponent } from './features/conductores/detail/detail.component';
+import { DriverHomeComponent } from './features/driver/home.component';
+import { DriverOrdersComponent } from './features/driver/orders.component';
+import { DriverMotoComponent } from './features/driver/moto.component';
+import { DriverProfileComponent } from './features/driver/profile.component';
+import { DriverListComponent } from './features/drivers/driver-list.component';
+import { DriverFormComponent } from './features/drivers/driver-form.component';
 
 export const routes: Routes = [
   {
@@ -41,6 +51,7 @@ export const routes: Routes = [
     component: ClientLayoutComponent,
     children: [
       { path: 'orders', component: OrdersComponent },
+      { path: 'orders/:id/track', component: MapConsumerComponent },
       { path: 'cart', component: CartComponent },
       { path: 'profile', component: ProfileComponent },
     ],
@@ -59,6 +70,19 @@ export const routes: Routes = [
     path: 'dashboard/restaurant/menu',
     canActivate: [authGuard],
     component: RestaurantMenuComponent,
+  },
+  {
+    path: 'dashboard/driver',
+    canActivate: [authGuard],
+    component: DriverHomeComponent,
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'drivers' },
+      { path: 'orders', component: DriverOrdersComponent },
+      { path: 'moto', component: DriverMotoComponent },
+      { path: 'profile', component: DriverProfileComponent },
+      { path: 'drivers', component: DriverListComponent },
+      { path: 'drivers/new', component: DriverFormComponent },
+    ],
   },
   {
     path: 'dashboard/admin',
@@ -82,6 +106,12 @@ export const routes: Routes = [
       { path: 'customers/edit/:id', component: CustomerFormContainerComponent },
 
       { path: 'orders', component: OrderManagerComponent },
+
+      // Conductores (Drivers)
+      { path: 'conductores', component: ConductoresListComponent },
+      { path: 'conductores/new', component: ConductoresFormComponent },
+      { path: 'conductores/edit/:id', component: ConductoresFormComponent },
+      { path: 'conductores/:id', component: ConductoresDetailComponent },
     ],
   },
 ];

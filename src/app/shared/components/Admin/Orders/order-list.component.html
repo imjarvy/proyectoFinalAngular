@@ -1,44 +1,94 @@
-<div class="overflow-x-auto">
-  <table class="min-w-full bg-white rounded shadow">
-    <thead>
-      <tr>
-        <th class="px-2 py-2">ID</th>
-        <th class="px-2 py-2">Cliente</th>
-        <th class="px-2 py-2">Moto</th>
-        <th class="px-2 py-2">Menú</th>
-        <th class="px-2 py-2">Cantidad</th>
-        <th class="px-2 py-2">Estado</th>
-        <th class="px-2 py-2">Total</th>
-        <th class="px-2 py-2">Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngIf="orders.length === 0">
-        <td colspan="8" class="text-center py-4">No hay pedidos.</td>
-      </tr>
-      <tr *ngFor="let order of orders; let index = index" class="border-b hover:bg-gray-50">
-        <td class="px-2 py-2">{{ order.id }}</td>
-        <td class="px-2 py-2">{{ getCustomerName(order.customer_id) }}</td>
-        <td class="px-2 py-2">{{ getMotorcyclePlate(order.motorcycle_id) }}</td>
-        <td class="px-2 py-2">{{ getMenuName(order.menu_id) }}</td>
-        <td class="px-2 py-2">{{ order.quantity }}</td>
-        <td class="px-2 py-2">{{ order.status }}</td>
-        <td class="px-2 py-2">{{ order.total_price }}</td>
-        <td class="px-2 py-2">
-          <button
-            class="bg-blue-500 text-white px-2 py-1 rounded mr-2"
-            (click)="onEdit(order.id)"
-          >
-            Editar
-          </button>
-          <button
-            class="bg-red-500 text-white px-2 py-1 rounded"
-            (click)="onDelete(order.id)"
-          >
-            Eliminar
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+<div class="orders-table-view">
+  <style>
+    .orders-table-view { font-family:'Poppins','Segoe UI',system-ui,-apple-system,sans-serif; color:#0f172a; }
+    .orders-table-wrapper { background:#fff; border-radius:20px; padding:24px; box-shadow:0 18px 40px rgba(15,23,42,0.12); border:1px solid rgba(15,23,42,0.06); position:relative; overflow:hidden; }
+    .orders-table-wrapper::after { content:""; position:absolute; inset:-80% 65% auto; width:340px; height:340px; background:radial-gradient(circle at center, rgba(124,58,237,0.18), transparent 65%); filter:blur(16px); }
+    .orders-inner { position:relative; z-index:1; overflow-x:auto; }
+    .styled-table { width:100%; border-collapse:separate; border-spacing:0; border-radius:18px; overflow:hidden; box-shadow:0 16px 32px rgba(15,23,42,0.1); }
+    .styled-table thead th { background:linear-gradient(90deg,#4c1d95,#7c3aed); color:#fff; padding:14px 16px; text-align:left; font-size:0.76rem; letter-spacing:0.08em; text-transform:uppercase; font-weight:700; }
+    .styled-table tbody td { background:#fff; padding:14px 16px; border-bottom:1px solid rgba(15,23,42,0.06); color:#334155; }
+    .styled-table tbody tr:nth-child(even) td { background:#f8fafc; }
+    .styled-table tbody tr:hover td { background:rgba(124,58,237,0.08); }
+    .cell-strong { font-weight:700; color:#0f172a; }
+    .cell-muted { color:#6b7280; }
+    .cell-center { text-align:center; }
+    .cell-right { text-align:right; }
+    .badge-status { display:inline-flex; align-items:center; justify-content:center; padding:6px 12px; border-radius:999px; font-weight:600; font-size:0.82rem; text-transform:capitalize; }
+    .status-pending { background:rgba(250,204,21,0.18); color:#b45309; }
+    .status-progress { background:rgba(59,130,246,0.18); color:#1d4ed8; }
+    .status-delivered { background:rgba(16,185,129,0.18); color:#0f766e; }
+    .status-cancelled { background:rgba(248,113,113,0.18); color:#b91c1c; }
+    .actions { display:flex; justify-content:flex-end; gap:10px; }
+    .chip-btn { border:none; padding:8px 14px; border-radius:999px; font-weight:600; transition:transform .18s ease, box-shadow .18s ease; cursor:pointer; }
+    .chip-edit { background:rgba(37,99,235,0.12); color:#1d4ed8; box-shadow:0 12px 24px rgba(37,99,235,0.18); }
+    .chip-edit:hover { transform:translateY(-2px); box-shadow:0 16px 30px rgba(37,99,235,0.24); }
+    .chip-delete { background:rgba(239,68,68,0.14); color:#b91c1c; box-shadow:0 12px 24px rgba(239,68,68,0.18); }
+    .chip-delete:hover { transform:translateY(-2px); box-shadow:0 16px 30px rgba(239,68,68,0.24); }
+    .empty-row { text-align:center; padding:18px; font-weight:600; color:#64748b; }
+    @media(max-width:768px){
+      .styled-table, .styled-table thead, .styled-table tbody, .styled-table th, .styled-table td, .styled-table tr { display:block; }
+      .styled-table thead { display:none; }
+      .styled-table tbody tr { margin-bottom:12px; border:1px solid rgba(15,23,42,0.08); border-radius:14px; overflow:hidden; box-shadow:0 14px 28px rgba(15,23,42,0.08); }
+      .styled-table tbody td { display:flex; justify-content:space-between; align-items:center; padding:12px 14px; }
+      .styled-table tbody td::before { content:attr(data-label); font-weight:700; color:#0f172a; text-transform:uppercase; letter-spacing:0.06em; font-size:0.7rem; }
+      .actions { justify-content:flex-start; }
+    }
+  </style>
+
+  <div class="orders-table-wrapper">
+    <div class="orders-inner">
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Moto</th>
+            <th>Menú</th>
+            <th>Cantidad</th>
+            <th>Estado</th>
+            <th>Total</th>
+            <th class="cell-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="orders.length === 0">
+            <td colspan="8" class="empty-row">No hay pedidos.</td>
+          </tr>
+          <tr *ngFor="let order of orders; let index = index">
+            <td class="cell-strong" data-label="ID">{{ order.id }}</td>
+            <td class="cell-strong" data-label="Cliente">{{ getCustomerName(order.customer_id) }}</td>
+            <td class="cell-muted" data-label="Moto">{{ getMotorcyclePlate(order.motorcycle_id) }}</td>
+            <td class="cell-muted" data-label="Menú">{{ getMenuName(order.menu_id) }}</td>
+            <td class="cell-center" data-label="Cantidad">{{ order.quantity }}</td>
+            <td class="cell-center" data-label="Estado">
+              <span class="badge-status"
+                    [ngClass]="{
+                      'status-pending': order.status === 'pending',
+                      'status-progress': order.status === 'in_progress',
+                      'status-delivered': order.status === 'delivered',
+                      'status-cancelled': order.status === 'cancelled'
+                    }">
+                {{ order.status }}
+              </span>
+            </td>
+            <td class="cell-right cell-strong" data-label="Total">{{ order.total_price }}</td>
+            <td class="actions" data-label="Acciones">
+              <button
+                class="chip-btn chip-edit"
+                (click)="onEdit(order.id)"
+              >
+                Editar
+              </button>
+              <button
+                class="chip-btn chip-delete"
+                (click)="onDelete(order.id)"
+              >
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
