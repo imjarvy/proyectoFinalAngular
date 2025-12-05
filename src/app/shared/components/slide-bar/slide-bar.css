@@ -623,3 +623,24 @@
 .menu::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
+
+/* Botón 'Volver al inicio' */
+.back-home-wrap { padding: 0.5rem 1rem 0; }
+.back-home-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  color: var(--sidebar-text);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 180ms ease, transform 180ms ease, border-color 180ms ease;
+}
+.back-home-btn:hover {
+  background: rgba(99, 102, 241, 0.18);
+  border-color: rgba(99, 102, 241, 0.4);
+  transform: translateX(-2px);
+}
+.back-home-btn i { color: var(--accent); font-size: 1rem; }

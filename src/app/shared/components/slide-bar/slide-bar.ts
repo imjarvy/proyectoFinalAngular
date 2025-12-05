@@ -121,4 +121,13 @@ export class SlideBar implements OnInit {
   private emitState(): void {
     this.sidebarStateChange.emit({ isOpen: this.isOpen, isMobile: this.isMobile });
   }
+
+  // Volver al inicio del sidebar: mostrar selector de tipo de usuario
+  resetSidebar(): void {
+    this.selectedUserType = null;
+    this.links = [];
+    this.activeSection = 'inicio';
+    this.isOpen = true; // mantener abierto para elegir
+    this.emitState();
+  }
 }

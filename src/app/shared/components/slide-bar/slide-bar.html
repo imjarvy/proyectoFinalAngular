@@ -49,6 +49,14 @@
       </div>
     </ng-container>
 
+    <!-- Botón para volver al inicio del sidebar -->
+    <div *ngIf="selectedUserType" class="back-home-wrap">
+      <button class="back-home-btn" type="button" (click)="resetSidebar()" title="Volver al inicio de la barra lateral">
+        <i class="bi bi-arrow-left"></i>
+        <span>Volver al inicio</span>
+      </button>
+    </div>
+
     <!-- Menú de navegación -->
     <ul class="menu" *ngIf="selectedUserType" role="menu" aria-label="Secciones">
       <li *ngFor="let link of links" role="none">
