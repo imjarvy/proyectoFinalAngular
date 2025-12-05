@@ -17,6 +17,8 @@ import { IssuesComponent } from './shared/components/Admin/issues/issues.compone
 import { CustomerListComponent } from './shared/components/Admin/customers/customer-list.component';
 import { CustomerFormContainerComponent } from './shared/components/Admin/customers/customer-form-container.component';
 import { OrderManagerComponent } from './shared/components/Admin/Orders/order-manager.component';
+import { RestaurantChartsComponent } from './shared/components/restaurant/restaurant-charts.component';
+import { RestaurantOrdersComponent } from './shared/components/restaurant/restaurant-orders.component';
 
 export const routes: Routes = [
   {
@@ -41,6 +43,16 @@ export const routes: Routes = [
       { path: 'cart', component: CartComponent },
       { path: 'profile', component: ProfileComponent },
     ],
+  },
+  {
+    path: 'dashboard/restaurant/charts',
+    canActivate: [authGuard],
+    component: RestaurantChartsComponent,
+  },
+  {
+    path: 'dashboard/restaurant/orders',
+    canActivate: [authGuard],
+    component: RestaurantOrdersComponent,
   },
   {
     path: 'dashboard/admin',

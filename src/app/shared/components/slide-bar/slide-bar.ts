@@ -94,7 +94,7 @@ export class SlideBar implements OnInit {
         { label: 'Inicio', route: '/dashboard/restaurant' },
         { label: 'Pedidos', route: '/dashboard/restaurant/orders' },
         { label: 'Menú', route: '/dashboard/restaurant/menu' },
-        { label: 'Perfil', route: '/dashboard/restaurant/profile' }
+        { label: 'Graficas', route: '/dashboard/restaurant/charts' }
       ];
       this.router.navigate(['/dashboard/restaurant']).catch(err => console.warn('navigate error', err));
     } else if (type === 'admin') {
