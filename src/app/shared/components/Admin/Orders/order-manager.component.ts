@@ -111,23 +111,23 @@ export class OrderManagerComponent implements OnInit {
   }
 
   async handleSubmit(formData: any): Promise<void> {
-    try {
-      if (this.editingOrder) {
-        const updated = await this.orderService.update(this.editingOrder.id, formData).toPromise();
-        this.orders = this.orders.map((o: any) =>
-          o.id === this.editingOrder.id ? updated : o
-        );
-      } else {
-        const created = await this.orderService.create(formData).toPromise();
-        this.orders = [...this.orders, created];
-      }
-      this.showForm = false;
-      this.editingOrder = null;
-    } catch (err) {
-      alert('Error guardando pedido');
+  try {
+    if (this.editingOrder) {
+      const updated = await this.orderService.update(this.editingOrder.id, formData).toPromise();
+      this.orders = this.orders.map((o: any) =>
+        o.id === this.editingOrder.id ? updated : o
+      );
+    } else {
+      const created = await this.orderService.create(formData).toPromise();
+      this.orders = [...this.orders, created];
     }
+    this.showForm = false;
+    this.editingOrder = null;
+  } catch (err) {
+    // Opcional: sólo loggear en consola, sin alert
+    console.error('Error guardando pedido', err);
   }
-
+}
   handleCancel(): void {
     this.showForm = false;
     this.editingOrder = null;

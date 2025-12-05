@@ -8,11 +8,12 @@ import { FloatingChatComponent } from './shared/components/floating-chat/floatin
 import { MapConsumerComponent } from './shared/components/map-consumer/map-consumer.component';
 import { ClientLayoutComponent } from './core/layouts/client-layout.component';
 import { MsalSyncComponent } from './shared/components/auth/msal-sync.component';
+import { NotificationCenterComponent } from './shared/components/notifications/notification-center.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, SlideBar, HeaderComponent, FloatingChatComponent, MapConsumerComponent, HttpClientModule, MsalSyncComponent, NgIf],
+  imports: [RouterOutlet, SlideBar, HeaderComponent, FloatingChatComponent, MapConsumerComponent, HttpClientModule, MsalSyncComponent, NgIf, NotificationCenterComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
