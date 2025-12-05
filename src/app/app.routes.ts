@@ -16,6 +16,7 @@ import { MotorcycleFormContainerComponent } from './shared/components/Admin/moto
 import { IssuesComponent } from './shared/components/Admin/issues/issues.component';
 import { CustomerListComponent } from './shared/components/Admin/customers/customer-list.component';
 import { CustomerFormContainerComponent } from './shared/components/Admin/customers/customer-form-container.component';
+import { OrderManagerComponent } from './shared/components/Admin/Orders/order-manager.component';
 
 export const routes: Routes = [
   {
@@ -61,6 +62,8 @@ export const routes: Routes = [
       { path: 'customers', component: CustomerListComponent },
       { path: 'customers/new', component: CustomerFormContainerComponent },
       { path: 'customers/edit/:id', component: CustomerFormContainerComponent },
+
+      { path: 'orders', component: OrderManagerComponent },
     ],
   },
 ];
