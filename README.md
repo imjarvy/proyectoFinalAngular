@@ -65,7 +65,7 @@ node src/app/infrastructure/gemini/gemini.js
 
 no olvide instalar la dependencia: 
 
-npm install express cors body-parser @google/generative-ai.
+npm install express cors body-parser @google/generative-ai
 
 Todo lo que agregue esta en:
 

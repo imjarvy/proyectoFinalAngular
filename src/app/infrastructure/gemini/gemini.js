@@ -11,7 +11,7 @@ const PORT = 3001; // Puedo cambiar el puerto si lo requiero
 app.use(cors());
 app.use(bodyParser.json());
 
-const API_KEY = 'AIzaSyDpLAJLcOKeoMGFPlNmsTG3Shijzq5W1DI';
+const API_KEY = 'AIzaSyBr-RhEpfwCTAFTzu7CsKdnJ163cZrPuMY';
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 app.post('/api/gemini', async (req, res) => {
