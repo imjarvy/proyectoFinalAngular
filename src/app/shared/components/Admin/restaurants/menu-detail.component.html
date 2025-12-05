@@ -1,0 +1,31 @@
+<div class="p-4">
+  <ng-container *ngIf="loading; else loaded">
+    <div>Cargando...</div>
+  </ng-container>
+
+  <ng-template #loaded>
+    <div *ngIf="error; else tableTpl" class="text-red-500">{{ error }}</div>
+  </ng-template>
+
+  <ng-template #tableTpl>
+    <h2 class="text-xl font-bold mb-4">Productos del Menú {{ restaurantId }}</h2>
+    <table class="min-w-full border">
+      <thead>
+        <tr>
+          <th class="border px-4 py-2">Categoría</th>
+          <th class="border px-4 py-2">Producto</th>
+          <th class="border px-4 py-2">Descripción</th>
+          <th class="border px-4 py-2">Precio</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let producto of productos; index as i">
+          <td class="border px-4 py-2">{{ producto.category }}</td>
+          <td class="border px-4 py-2">{{ producto.name }}</td>
+          <td class="border px-4 py-2">{{ producto.description }}</td>
+          <td class="border px-4 py-2">{{ producto.price }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </ng-template>
+</div>

@@ -1,0 +1,53 @@
+<form (ngSubmit)="submit()" class="max-w-lg mx-auto bg-white shadow p-6 space-y-4 rounded">
+  <div>
+    <label class="block">Placa</label>
+    <input
+      type="text"
+      name="license_plate"
+      [(ngModel)]="values.license_plate"
+      pattern="^[A-Z]{3}\d{3}$"
+      required
+      class="border px-2 py-1 w-full"
+      placeholder="Ej: ABC123"
+    />
+  </div>
+  <div>
+    <label class="block">Marca</label>
+    <input
+      type="text"
+      name="brand"
+      [(ngModel)]="values.brand"
+      required
+      class="border px-2 py-1 w-full"
+    />
+  </div>
+  <div>
+    <label class="block">Año</label>
+    <input
+      type="number"
+      name="year"
+      [(ngModel)]="values.year"
+      min="2000"
+      [max]="currentYear"
+      required
+      class="border px-2 py-1 w-full"
+    />
+  </div>
+  <div>
+    <label class="block">Estado</label>
+    <select
+      name="status"
+      [(ngModel)]="values.status"
+      required
+      class="border px-2 py-1 w-full"
+    >
+      <option value="">Seleccione</option>
+      <option value="available">Disponible</option>
+      <option value="busy">Ocupada</option>
+      <option value="under_maintenance">En mantenimiento</option>
+    </select>
+  </div>
+  <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">
+    {{ isEdit ? 'Actualizar' : 'Crear' }}
+  </button>
+</form>

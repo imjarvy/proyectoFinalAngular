@@ -1,16 +1,14 @@
-import { Component, HostListener, OnInit, Output, EventEmitter } from '@angular/core';
-import { Input } from '@angular/core';
+import { Component, HostListener, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
 import { ThemeService } from '../../../core/services/theme.service';
-import { RouterModule } from '@angular/router';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-slide-bar',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './slide-bar.html',
-  styleUrl: './slide-bar.css',
+  styleUrls: ['./slide-bar.css'],
 })
 export class SlideBar implements OnInit {
   @Input() links: Array<{ label: string; route: string }> = [];
@@ -20,7 +18,7 @@ export class SlideBar implements OnInit {
     { label: 'Administrador', value: 'admin' },
     { label: 'Conductor', value: 'driver' }
   ];
-  selectedUserType: string|null = null;
+  selectedUserType: string | null = null;
   isOpen = false; // Cerrado por defecto
   isMobile = false;
   private wasMobile = false;
@@ -42,14 +40,14 @@ export class SlideBar implements OnInit {
 
   private checkScreenSize(): void {
     const currentIsMobile = window.innerWidth < 768;
-    
+
     // Solo cambiar el estado si realmente cambió el modo (mobile <-> desktop)
     if (currentIsMobile !== this.wasMobile) {
       this.isMobile = currentIsMobile;
-      
+
       // Cerrado por defecto en ambos modos
       this.isOpen = false;
-      
+
       this.wasMobile = this.isMobile;
       this.emitState();
     } else {
@@ -90,7 +88,7 @@ export class SlideBar implements OnInit {
         { label: 'Carrito', route: '/dashboard/client/cart' },
         { label: 'Perfil', route: '/dashboard/client/profile' }
       ];
-      this.router.navigate(['/dashboard/client']);
+      this.router.navigate(['/dashboard/client']).catch(err => console.warn('navigate error', err));
     } else if (type === 'restaurant') {
       this.links = [
         { label: 'Inicio', route: '/dashboard/restaurant' },
@@ -98,16 +96,16 @@ export class SlideBar implements OnInit {
         { label: 'Menú', route: '/dashboard/restaurant/menu' },
         { label: 'Perfil', route: '/dashboard/restaurant/profile' }
       ];
-      this.router.navigate(['/dashboard/restaurant']);
+      this.router.navigate(['/dashboard/restaurant']).catch(err => console.warn('navigate error', err));
     } else if (type === 'admin') {
       this.links = [
-        { label: 'Restaurantes', route: '/dashboard/restaurants' },
+        { label: 'Restaurantes', route: '/dashboard/admin/restaurants' },
         { label: 'Clientes', route: '/dashboard/admin/customers' },
         { label: 'Motos', route: '/dashboard/admin/motorcycles' },
         { label: 'Pedidos', route: '/dashboard/admin/orders' },
         { label: 'Incidencias', route: '/dashboard/admin/issues' }
       ];
-      this.router.navigate(['/dashboard/admin']);
+      this.router.navigate(['/dashboard/admin']).catch(err => console.warn('navigate error', err));
     } else if (type === 'driver') {
       this.links = [
         { label: 'Inicio', route: '/dashboard/driver' },
@@ -115,7 +113,7 @@ export class SlideBar implements OnInit {
         { label: 'Mi Moto', route: '/dashboard/driver/moto' },
         { label: 'Perfil', route: '/dashboard/driver/profile' }
       ];
-      this.router.navigate(['/dashboard/driver']);
+      this.router.navigate(['/dashboard/driver']).catch(err => console.warn('navigate error', err));
     }
     // Links and navigation for all user types handled above
   }

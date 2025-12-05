@@ -1,0 +1,66 @@
+<div class="container mx-auto p-4">
+  <ng-container *ngIf="loading; else loadedTpl">
+    <div>Cargando...</div>
+  </ng-container>
+
+  <ng-template #loadedTpl>
+    <div *ngIf="error" class="text-red-500 mb-2">Error: {{ error }}</div>
+
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-bold">Lista de Restaurantes</h2>
+      <a
+        [routerLink]="['/dashboard/admin/restaurants/new']"
+        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+      >
+        Crear Restaurante
+      </a>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+        <thead>
+          <tr>
+            <th class="px-4 py-2 border-b">Nombre</th>
+            <th class="px-4 py-2 border-b">Dirección</th>
+            <th class="px-4 py-2 border-b">Teléfono</th>
+            <th class="px-4 py-2 border-b">Correo</th>
+            <th class="px-4 py-2 border-b">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let restaurant of restaurants" class="text-center">
+            <td class="px-4 py-2 border-b">
+              {{ restaurant.address }}
+            </td>
+            <td class="px-4 py-2 border-b">
+              {{ restaurant.phone }}
+            </td>
+            <td class="px-4 py-2 border-b">
+              {{ restaurant.email }}
+            </td>
+            <td class="px-4 py-2 border-b space-x-2">
+              <a
+                [routerLink]="['/dashboard/admin/restaurants/edit', restaurant.id]"
+                class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+              >
+                Editar
+              </a>
+              <a
+                [routerLink]="['/dashboard/admin/restaurants/menu', restaurant.id]"
+                class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+              >
+                Menú
+              </a>
+              <button
+                (click)="handleDelete(restaurant.id)"
+                class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+              >
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-template>
+</div>

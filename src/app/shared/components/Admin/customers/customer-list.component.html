@@ -1,0 +1,41 @@
+<div class="container mx-auto p-4">
+  <ng-container *ngIf="loading; else loadedTpl">
+    <div>Cargando...</div>
+  </ng-container>
+
+  <ng-template #loadedTpl>
+    <div *ngIf="error" class="text-red-500 mb-2">Error: {{ error }}</div>
+
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-bold">Lista de Clientes</h2>
+      <a
+        [routerLink]="['/dashboard/admin/customers/new']"
+        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+      >
+        Crear Cliente
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div *ngFor="let customer of customers" class="bg-white p-4 rounded-lg shadow">
+        <h3 class="text-xl font-semibold">{{ customer.name }}</h3>
+        <p class="text-gray-600">{{ customer.email }}</p>
+        <p class="text-gray-600">{{ customer.phone }}</p>
+        <div class="mt-4 flex justify-end space-x-2">
+          <a
+            [routerLink]="['/dashboard/admin/customers/edit', customer.id]"
+            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Editar
+          </a>
+          <button
+            (click)="handleDelete(customer.id!)"
+            class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+          >
+            Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>

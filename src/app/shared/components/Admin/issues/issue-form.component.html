@@ -1,0 +1,50 @@
+<form (ngSubmit)="submit()" class="space-y-4">
+  <select
+    name="motorcycle_id"
+    required
+    [(ngModel)]="form.motorcycle_id"
+    class="w-full border px-2 py-1 rounded"
+  >
+    <option value="">Selecciona Motocicleta</option>
+    <option *ngFor="let m of motorcycles" [value]="m.id">{{ m.license_plate }}</option>
+  </select>
+
+  <input
+    name="description"
+    [(ngModel)]="form.description"
+    placeholder="Descripción"
+    required
+    class="w-full border px-2 py-1 rounded"
+  />
+
+  <select
+    name="issue_type"
+    required
+    [(ngModel)]="form.issue_type"
+    class="w-full border px-2 py-1 rounded"
+  >
+    <option *ngFor="let type of issueTypes" [value]="type">{{ type }}</option>
+  </select>
+
+  <input
+    name="date_reported"
+    type="datetime-local"
+    [(ngModel)]="form.date_reported"
+    required
+    class="w-full border px-2 py-1 rounded"
+  />
+
+  <select
+    name="status"
+    required
+    [(ngModel)]="form.status"
+    class="w-full border px-2 py-1 rounded"
+  >
+    <option *ngFor="let st of statuses" [value]="st">{{ st }}</option>
+  </select>
+
+  <div class="flex gap-2">
+    <button type="submit" class="bg-blue-600 text-white rounded px-3 py-1">Guardar</button>
+    <button type="button" class="bg-gray-300 rounded px-3 py-1" (click)="onCancel()">Cancelar</button>
+  </div>
+</form>

@@ -1,0 +1,67 @@
+<div>
+  <h2 class="text-2xl font-bold mb-4">Gestión de Incidencias</h2>
+  <button
+    class="mb-4 bg-green-600 text-white px-4 py-2 rounded"
+    (click)="handleCreate()"
+  >
+    Nuevo Issue
+  </button>
+  <table class="min-w-full bg-white rounded shadow">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Motocicleta</th>
+        <th>Descripción</th>
+        <th>Tipo</th>
+        <th>Fecha</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let issue of issues">
+        <td>{{ issue.id }}</td>
+        <td>
+          {{ findMotorcycle(issue.motorcycle_id)?.license_plate || '—' }}
+        </td>
+        <td>{{ issue.description }}</td>
+        <td>{{ issue.issue_type }}</td>
+        <td>{{ issue.date_reported }}</td>
+        <td>
+          <select
+            [ngModel]="issue.status"
+            (ngModelChange)="handleStatusChange(issue.id, $event)"
+          >
+            <option *ngFor="let st of statusOptions" [value]="st">{{ st }}</option>
+          </select>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ng-container *ngIf="showForm">
+    <div
+      class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-40 transition-all"
+      (click)="showForm = false"
+    >
+      <div
+        class="bg-white rounded-lg shadow-2xl p-8 max-w-lg w-full relative"
+        (click)="$event.stopPropagation()"
+      >
+        <button
+          class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl"
+          (click)="showForm = false"
+          aria-label="Cerrar"
+          type="button"
+        >
+          ×
+        </button>
+        <h3 class="text-xl font-bold mb-4">Nuevo Issue</h3>
+        <app-admin-issue-form
+          [motorcycles]="motorcycles"
+          (submitIssue)="handleFormSubmit($event)"
+          (cancel)="showForm = false"
+        ></app-admin-issue-form>
+      </div>
+    </div>
+  </ng-container>
+</div>

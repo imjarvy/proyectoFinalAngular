@@ -1,0 +1,54 @@
+<div>
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-bold">Motocicletas</h2>
+    <a
+      [routerLink]="['/dashboard/admin/motorcycles/new']"
+      class="bg-blue-600 text-white px-4 py-2 rounded"
+    >
+      Agregar moto
+    </a>
+  </div>
+  <ng-container *ngIf="loading; else tableTpl">
+    <p>Cargando...</p>
+  </ng-container>
+  <ng-template #tableTpl>
+    <table class="w-full border">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Placa</th>
+          <th>Marca</th>
+          <th>Año</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let moto of motorcycles">
+          <td>{{ moto.id }}</td>
+          <td>{{ moto.license_plate }}</td>
+          <td>{{ moto.brand }}</td>
+          <td>{{ moto.year }}</td>
+          <td>{{ moto.status }}</td>
+          <td>
+            <button
+              (click)="goEdit(moto.id)"
+              class="text-blue-600 mr-2"
+            >
+              Editar
+            </button>
+            <button
+              (click)="handleDelete(moto.id)"
+              class="text-red-600"
+            >
+              Eliminar
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="motorcycles.length === 0">
+          <td colspan="6" class="text-center py-4">Sin motocicletas registradas.</td>
+        </tr>
+      </tbody>
+    </table>
+  </ng-template>
+</div>
