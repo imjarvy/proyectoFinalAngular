@@ -97,6 +97,7 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
   notifications: UiNotification[] = [];
   private sub?: Subscription;
   private idCounter = 0;
+  // En Angular, todos los assets se sirven desde /assets en la raíz
   private audio = new Audio('assets/notification.mp3');
 
   constructor(private notificationService: NotificationService) {}
