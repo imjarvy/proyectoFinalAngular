@@ -5,12 +5,13 @@ import { NgIf } from '@angular/common';
 import { MsalSyncComponent } from './shared/components/auth/msal-sync.component';
 import { HeaderComponent } from './shared/components/Header/header.Component';
 import { SlideBar } from './shared/components/slide-bar/slide-bar';
+import { NotificationCenterComponent } from './shared/components/notifications/notification-center.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   standalone: true,
-  imports: [MsalSyncComponent, HeaderComponent, SlideBar, RouterOutlet, NgIf],
+  imports: [MsalSyncComponent, HeaderComponent, SlideBar, RouterOutlet, NgIf, NotificationCenterComponent],
 })
 export class AppComponent {
   constructor(private router: Router) {}

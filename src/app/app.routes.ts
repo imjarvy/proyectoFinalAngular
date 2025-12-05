@@ -19,6 +19,7 @@ import { CustomerFormContainerComponent } from './shared/components/Admin/custom
 import { OrderManagerComponent } from './shared/components/Admin/Orders/order-manager.component';
 import { RestaurantChartsComponent } from './shared/components/restaurant/restaurant-charts.component';
 import { RestaurantOrdersComponent } from './shared/components/restaurant/restaurant-orders.component';
+import { RestaurantMenuComponent } from './shared/components/restaurant/restaurant-menu.component';
 
 export const routes: Routes = [
   {
@@ -53,6 +54,11 @@ export const routes: Routes = [
     path: 'dashboard/restaurant/orders',
     canActivate: [authGuard],
     component: RestaurantOrdersComponent,
+  },
+  {
+    path: 'dashboard/restaurant/menu',
+    canActivate: [authGuard],
+    component: RestaurantMenuComponent,
   },
   {
     path: 'dashboard/admin',

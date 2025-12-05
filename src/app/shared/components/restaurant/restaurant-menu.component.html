@@ -1,0 +1,91 @@
+<div class="max-w-2xl mx-auto p-4">
+  <h2 class="text-2xl font-bold mb-4">Menú por Restaurante</h2>
+
+  <div *ngIf="error" class="text-red-500 mb-2">{{ error }}</div>
+
+  <div class="mb-4">
+    <label class="block mb-1">Restaurante</label>
+    <select
+      class="border rounded w-full p-2"
+      [ngModel]="selectedRestaurant"
+      (ngModelChange)="onRestaurantChange($event)"
+    >
+      <option value="">Selecciona un restaurante</option>
+      <option *ngFor="let r of restaurants" [value]="r.id">{{ r.name }}</option>
+    </select>
+  </div>
+
+  <div class="mb-4">
+    <label class="block mb-1">Producto</label>
+    <select
+      class="border rounded w-full p-2"
+      [ngModel]="selectedProduct"
+      (ngModelChange)="onProductChange($event)"
+    >
+      <option value="">Selecciona un producto</option>
+      <option *ngFor="let p of products" [value]="p.id">{{ p.name }}</option>
+    </select>
+  </div>
+
+  <div class="mb-4">
+    <label class="block mb-1">Precio</label>
+    <input
+      type="number"
+      class="border rounded w-full p-2"
+      [ngModel]="price"
+      (ngModelChange)="price = $event"
+      [disabled]="!selectedProduct"
+    />
+  </div>
+
+  <button
+    class="bg-blue-500 text-white px-4 py-2 rounded mb-4"
+    (click)="addProductToMenu()"
+    [disabled]="!selectedProduct || !price"
+  >
+    Agregar producto al menú
+  </button>
+
+  <h3 class="text-xl font-semibold mt-6 mb-2">Productos en el menú</h3>
+  <table class="min-w-full bg-white border border-gray-200 rounded-lg mb-4">
+    <thead>
+      <tr>
+        <th class="px-4 py-2 border-b">Categoría</th>
+        <th class="px-4 py-2 border-b">Producto</th>
+        <th class="px-4 py-2 border-b">Descripción</th>
+        <th class="px-4 py-2 border-b">Precio</th>
+        <th class="px-4 py-2 border-b">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let prod of menuProducts; let idx = index">
+        <td class="px-4 py-2 border-b">{{ prod.category }}</td>
+        <td class="px-4 py-2 border-b">{{ prod.name }}</td>
+        <td class="px-4 py-2 border-b">{{ prod.description }}</td>
+        <td class="px-4 py-2 border-b">{{ prod.price }}</td>
+        <td class="px-4 py-2 border-b flex gap-2 justify-center">
+          <button
+            class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+            (click)="editProduct(prod)"
+          >
+            Editar
+          </button>
+          <button
+            class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+            (click)="removeProductFromMenu(idx)"
+          >
+            Eliminar
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <button
+    class="bg-green-500 text-white px-4 py-2 rounded"
+    (click)="saveMenu()"
+    [disabled]="!selectedRestaurant || menuProducts.length === 0 || loading"
+  >
+    Guardar Menú
+  </button>
+</div>

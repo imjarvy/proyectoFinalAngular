@@ -47,9 +47,11 @@ export class OrderFormContainerComponent implements OnChanges {
 
   handleSubmit(form: any): void {
     this.submit.emit({
-      ...form,
+      customer_id: Number(form.customer_id),
+      menu_id: Number(form.menu_id),
+      motorcycle_id: form.motorcycle_id ? Number(form.motorcycle_id) : null,
       quantity: Number(form.quantity),
-      total_price: Number(form.total_price),
+      status: form.status || 'pending',
     });
   }
 
